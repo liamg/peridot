@@ -1,0 +1,8 @@
+include:
+- neovim
+variables:
+  test: hello
+files:
+  - target: ""
+    source: ""
+    template: false
