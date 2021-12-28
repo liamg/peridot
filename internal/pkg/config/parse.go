@@ -1,31 +1,48 @@
 package config
 
 import (
-	"io"
+	"bytes"
+	"fmt"
+	"os"
+	"path/filepath"
 
+	"github.com/liamg/peridot/internal/pkg/template"
 	"gopkg.in/yaml.v3"
 )
 
-type File struct {
-	Name          string            `yaml:"name"`
-	Includes      []string          `yaml:"includes"`
-	Variables     map[string]string `yaml:"variables"`
-	TemplateFiles []TemplateFile    `yaml:"files"`
-}
-
-type TemplateFile struct {
-	Target string `yaml:"target"`
-	Source string `yaml:"source"`
-	Raw    bool   `yaml:"raw"`
-}
-
-func Parse(r io.Reader) (*File, error) {
-	var f File
-	if err := yaml.NewDecoder(r).Decode(&f); err != nil {
+func ParseVariables(path string) ([]Variable, error) {
+	var sniff variableSniff
+	f, err := os.Open(path)
+	if err != nil {
 		return nil, err
 	}
-	if f.Variables == nil {
-		f.Variables = make(map[string]string)
+	defer func() { _ = f.Close() }()
+	if err := yaml.NewDecoder(f).Decode(&sniff); err != nil {
+		return nil, fmt.Errorf("error in %s: %w", path, err)
 	}
-	return &f, nil
+	return sniff.Variables, nil
+}
+
+func Parse(path string, variables map[string]interface{}) (*Module, error) {
+	var m Module
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = f.Close() }()
+
+	var output []byte
+	buffer := bytes.NewBuffer(output)
+	if err := template.Apply(f, buffer, variables); err != nil {
+		return nil, err
+	}
+	if err := yaml.Unmarshal(buffer.Bytes(), &m); err != nil {
+		return nil, fmt.Errorf("error in %s: %w", path, err)
+	}
+	if err := m.Validate(); err != nil {
+		return nil, err
+	}
+	m.Path = path
+	m.Dir = filepath.Dir(path)
+	return &m, nil
 }

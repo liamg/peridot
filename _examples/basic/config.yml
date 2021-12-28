@@ -1,8 +1,10 @@
-include:
-- neovim
-variables:
-  test: hello
-files:
-  - target: ""
-    source: ""
-    template: false
+modules:
+  - name: git
+    source: builtin:git
+    variables:
+      email: test@test.com
+  - name: my custom module
+    source: ./custom
+    variables:
+      x: 1
+      y: 2

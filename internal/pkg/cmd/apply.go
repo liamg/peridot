@@ -2,16 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/liamg/peridot/internal/pkg/module"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	var fullContentDiffs bool
-	diffCmd := &cobra.Command{
-		Use:   "diff",
+	applyCmd := &cobra.Command{
+		Use:   "apply",
 		Short: "Compare the desired state as dictated by your peridot templates and config files with the actual local state.",
 		Run: func(cmd *cobra.Command, args []string) {
 			root, err := module.LoadRoot()
@@ -32,23 +30,19 @@ func init() {
 			}
 
 			for _, fileDiff := range fileDiffs {
-				fileDiff.Print(fullContentDiffs)
-				fmt.Println("")
+				if err := fileDiff.Apply(); err != nil {
+					fail(err)
+				}
 			}
 
 			for _, moduleDiff := range moduleDiffs {
-				moduleDiff.Print()
-				fmt.Println("")
+				if err := moduleDiff.Apply(); err != nil {
+					fail(err)
+				}
 			}
 
-			fmt.Printf("\n%d pending changes detected.", changeCount)
+			fmt.Printf("\n%d changes applied successfully.", changeCount)
 		},
 	}
-	diffCmd.Flags().BoolVarP(&fullContentDiffs, "show-content", "s", fullContentDiffs, "Show full git-style file content diffs.")
-	rootCmd.AddCommand(diffCmd)
-}
-
-func fail(reason interface{}) {
-	_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", reason)
-	os.Exit(1)
+	rootCmd.AddCommand(applyCmd)
 }

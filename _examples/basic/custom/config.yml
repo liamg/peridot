@@ -1,0 +1,10 @@
+variables:
+  - name: x
+    type: integer
+    default: 13
+  - name: y
+    type: integer
+    default: 37
+files:
+  - target: {{ .user_home_dir }}{{ .sep }}example.txt
+    template: ./custom.tpl

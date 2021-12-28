@@ -36,7 +36,14 @@ Applies changes to the local state to conform to your peridot templates and conf
 
 ## Variables
 
-| Name          | Description |
-|---------------|-------------|
-| config_dir    | `$XDG_CONFIG_HOME` if it exists, otherwise `~/.config`
-| 
+| Name               | Description |
+|--------------------|-------------|
+| user_config_dir    | `$XDG_CONFIG_HOME` if it exists, otherwise `~/.config`.
+| user_home_dir      | Current user's home directory.
+
+Variables for a module come from the module defaults, the parent modules variables for that module, or from the global overrides.
+
+Global overrides are looked at first, then configured values, then defaults. If no value is found, a template error will occur and execution will fail.
+
+Load config -> read innermodules and vars. 
+For each inner module, parse the input variables from the actual module, merge these defaults with the inner module values, and finally merge with the global overrides (these are namespaced by module.)

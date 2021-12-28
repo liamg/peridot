@@ -6,27 +6,16 @@ import (
 	"text/template"
 )
 
-type Input struct {
-	Variables map[string]string
-}
-
-func Apply(r io.Reader, w io.Writer, input Input) error {
+func Apply(r io.Reader, w io.Writer, vars map[string]interface{}) error {
 	raw, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
-	t, err := template.New("tmp").Funcs(template.FuncMap{
-		"var": func(name string) string {
-			if val, ok := input.Variables[name]; ok {
-				return val
-			}
-			return "fuck"
-		},
-	}).Parse(string(raw))
+	t, err := template.New("tmp").Parse(string(raw))
 	if err != nil {
 		return err
 	}
-	err = t.Execute(w, input.Variables)
+	err = t.Execute(w, vars)
 	if err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -13,20 +14,33 @@ type Config struct {
 	Debug bool   `yaml:"debug"`
 }
 
-func ParseRoot() (*Config, error) {
+type Override struct {
+	Variables map[string]map[string]interface{} `yaml:"variables"`
+}
+
+func ParseRoot() (*Module, *Override, error) {
 	path, err := Path()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	f, err := os.Open(path)
+	var override Override
+	localPath := filepath.Join(filepath.Dir(path), localOverridesFilename)
+	if _, err := os.Stat(localPath); err == nil {
+		f, err := os.Open(localPath)
+		if err != nil {
+			return nil, nil, err
+		}
+		defer f.Close()
+
+		if err := yaml.NewDecoder(f).Decode(&override); err != nil {
+			return nil, nil, fmt.Errorf("error in %s: %w", localPath, err)
+		}
+	} else if !os.IsNotExist(err) {
+		return nil, nil, err
+	}
+	mod, err := Parse(path, BaseVariables())
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	var c Config
-	if err := yaml.NewDecoder(f).Decode(&c); err != nil {
-		return nil, err
-	}
-	c.Dir = filepath.Dir(path)
-	c.Path = path
-	return &c, nil
+	return mod, &override, nil
 }

@@ -11,11 +11,9 @@ import (
 
 func TestVariables(t *testing.T) {
 
-	raw := `hello {{ var "test" }}`
-	input := Input{
-		Variables: map[string]string{
-			"test": "world",
-		},
+	raw := `hello {{ .test }}`
+	input := map[string]interface{}{
+		"test": "world",
 	}
 	var output []byte
 	buffer := bytes.NewBuffer(output)

@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	dir      = "peridot"
-	filename = "config.yml"
+	dir                    = "peridot"
+	Filename               = "config.yml"
+	localOverridesFilename = "local.yml"
 )
 
 func Path() (string, error) {
@@ -16,7 +17,7 @@ func Path() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Abs(filepath.Join(root, dir, filename))
+	return filepath.Abs(filepath.Join(root, dir, Filename))
 }
 
 func configRoot() (string, error) {
