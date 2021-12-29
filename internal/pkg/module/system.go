@@ -30,7 +30,6 @@ func getDistro() string {
 		"/etc/os-release",
 		"/usr/lib/os-release",
 		"/etc/initrd-release",
-		"/usr/lib/extension-release.d/extension-release.IMAGE",
 	} {
 		data, err := os.ReadFile(file)
 		if err != nil {
