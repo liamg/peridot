@@ -17,14 +17,14 @@ You can use a module by adding an item to the `modules` list in your main `confi
 
 For example:
 
-```yaml
+{% highlight yaml %}
 modules:
     - name: git example
       source: builtin:git
       variables:
         username: Bobby Tables
         email: bobby@tabl.es
-```
+{% endhighlight %}
 
 The important parameter here is `source`, as it tells peridot which module to load. Built-in modules have a `builtin:` prefix, locally defined custom modules have a `./` prefix, and community modules use URLs to a `.tar.gz` file containing module source code.
 
