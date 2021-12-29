@@ -36,7 +36,7 @@ There will often be modules which should only be applied in a certain scenario. 
 
 A filter is a list of values for which a match indicates the module should be applied. If there is no match, the module is simply ignored.
 
-For example, the following module will only be applied
+For example, the following module will only be applied on Linux, when the architecture is either `amd64` or `arm64`
 
 ```yaml
 modules:
@@ -47,7 +47,7 @@ modules:
       filters:
         arch:
           - amd64
-          - x86
+          - arm64
         os: 
           - linux
 ```
