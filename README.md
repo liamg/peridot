@@ -2,6 +2,8 @@
 
 User environment management for Linux/OSX. Think Terraform for your dotfiles and local setup that can be replicated across your machines, regardless of differences in distro, window manager etc.
 
+If you struggle with maintaining your dotfiles in one big git repository and/or sharing them across multiple machines, Peridot is for you.
+
 ## Documentation
 
 Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/guide).
