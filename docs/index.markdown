@@ -3,5 +3,8 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: page
+title: Home
+nav_order: 1
 ---
-Hello world!
+
+Peridot is a CLI utility that provides user environment management for Linux/OSX. Think Terraform for your dotfiles and local setup that can be replicated across your machines, regardless of differences in distro, window manager etc.
