@@ -11,7 +11,7 @@ Peridot modules are a useful way of organising configuration into reusable, simp
 
 A module is typically a single directory containing a `config.yml`, and optionally some supporting files. Modules can be nested inside one another indefinitely, so you can break down a module into sensible submodules where required, and so on.
 
-There are three types of module: [built-in](builtins), [community](community) and [custom](custom). Whilst you can achieve anything by writing your own custom modules, built-in and community modules often provide off-the-shelf setups that make progress much faster.
+There are three types of module: [built-in](builtins), [custom](custom) and [community](community). Whilst you can achieve anything by writing your own custom modules, built-in and community modules often provide off-the-shelf setups that make progress much faster.
 
 You can use a module by adding an item to the `modules` list in your main `config.yml`.
 
