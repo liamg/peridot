@@ -3,8 +3,13 @@ package module
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
-	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/hexops/gotextdiff"
+	"github.com/hexops/gotextdiff/myers"
+	"github.com/hexops/gotextdiff/span"
+	"github.com/liamg/tml"
 )
 
 type FileOperation uint8
@@ -45,15 +50,22 @@ func (d *fileDiff) Operation() FileOperation {
 }
 
 func (d *fileDiff) Print(withContent bool) {
-	dmp := diffmatchpatch.New()
-
-	diffs := dmp.DiffMain(d.before, d.after, false)
 
 	if withContent {
-		fmt.Printf("File '%s' has pending changes:\n", d.path)
-		fmt.Println(dmp.DiffPrettyText(diffs))
+		tml.Printf("<yellow>[Module %s] Changes required for '%s':</yellow>\n", d.module.Name(), d.path)
+		edits := myers.ComputeEdits(span.URI(d.path), d.before, d.after)
+		for _, line := range strings.Split(fmt.Sprintf("%s", gotextdiff.ToUnified("before", "after", d.before, edits)), "\n") {
+			switch {
+			case len(line) > 0 && line[0] == '+':
+				tml.Printf("<green>%s</green>\n", line)
+			case len(line) > 0 && line[0] == '-':
+				tml.Printf("<red>%s</red>\n", line)
+			default:
+				fmt.Println(line)
+			}
+		}
 	} else {
-		fmt.Printf("File '%s' has pending changes.\n", d.path)
+		tml.Printf("<yellow>[Module %s] Changes required for '%s'.</yellow>\n", d.module.Name(), d.path)
 	}
 }
 
@@ -62,6 +74,10 @@ func (d *fileDiff) Apply() error {
 	case OpDelete:
 		return os.Remove(d.path)
 	default:
+		dir := filepath.Dir(d.path)
+		if err := os.MkdirAll(dir, 0700); err != nil {
+			return err
+		}
 		f, err := os.Create(d.path)
 		if err != nil {
 			return err

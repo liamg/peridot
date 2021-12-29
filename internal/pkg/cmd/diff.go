@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/liamg/peridot/internal/pkg/module"
+	"github.com/liamg/tml"
 	"github.com/spf13/cobra"
 )
 
@@ -19,36 +17,29 @@ func init() {
 				fail(err)
 			}
 
-			moduleDiffs, fileDiffs, err := root.Diff()
+			diffs, err := module.Diff(root)
 			if err != nil {
 				fail(err)
 			}
 
-			changeCount := len(moduleDiffs) + len(fileDiffs)
+			changeCount := len(diffs)
 
 			if changeCount == 0 {
-				fmt.Println("Nothing to do, no changes necessary.")
+				tml.Println("<yellow><bold>Nothing to do, no changes necessary.</bold></yellow>")
 				return
 			}
 
-			for _, fileDiff := range fileDiffs {
-				fileDiff.Print(fullContentDiffs)
-				fmt.Println("")
+			for _, diff := range diffs {
+				diff.Print(fullContentDiffs)
 			}
 
-			for _, moduleDiff := range moduleDiffs {
-				moduleDiff.Print()
-				fmt.Println("")
+			if changeCount == 1 {
+				tml.Printf("\n<yellow><bold>%d module has pending changes.</bold></yellow>\n", changeCount)
+			} else {
+				tml.Printf("\n<yellow><bold>%d modules have pending changes.</bold></yellow>\n", changeCount)
 			}
-
-			fmt.Printf("\n%d pending changes detected.", changeCount)
 		},
 	}
 	diffCmd.Flags().BoolVarP(&fullContentDiffs, "show-content", "s", fullContentDiffs, "Show full git-style file content diffs.")
 	rootCmd.AddCommand(diffCmd)
-}
-
-func fail(reason interface{}) {
-	_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", reason)
-	os.Exit(1)
 }

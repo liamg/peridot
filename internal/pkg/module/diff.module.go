@@ -1,11 +1,16 @@
 package module
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/liamg/tml"
+)
 
 type moduleDiff struct {
-	module Module
-	before State
-	after  State
+	module    Module
+	fileDiffs []FileDiff
+	before    State
+	after     State
 }
 
 func (d *moduleDiff) Module() Module {
@@ -20,29 +25,47 @@ func (d *moduleDiff) After() State {
 	return d.after
 }
 
-func (d *moduleDiff) Print() {
-	switch {
-	case d.before == d.after:
-		fmt.Printf("Module %s has no known changes.\n", d.module.Name())
-	case d.after == StateInstalled:
-		fmt.Printf("Module %s will be installed.\n", d.module.Name())
-	case d.after == StateUninstalled:
-		fmt.Printf("Module %s will be uninstalled.\n", d.module.Name())
-	case d.after == StateUpdated:
-		fmt.Printf("Module %s will be updated.\n", d.module.Name())
+func (d *moduleDiff) Print(withContent bool) {
+	for _, f := range d.fileDiffs {
+		f.Print(withContent)
+	}
+	if d.before != d.after {
+		switch {
+		case d.after == StateInstalled:
+			tml.Printf("<green>[Module %s] Requires install.</green>\n", d.module.Name())
+		case d.after == StateUninstalled:
+			tml.Printf("<red>[Module %s] Requires uninstall.</red>\n", d.module.Name())
+		case d.after == StateUpdated:
+			tml.Printf("<yellow>[Module %s] Requires updated.</yellow>\n", d.module.Name())
+		}
 	}
 
 }
 
 func (d *moduleDiff) Apply() error {
-	switch d.after {
-	case StateInstalled:
-		return d.module.Install()
-	case StateUpdated:
-		return d.module.Update()
-	case StateUninstalled:
-		return fmt.Errorf("uninstallation is currently not supported")
-	default:
-		return fmt.Errorf("cannot support state 0x%X for module %s", d.after, d.module.Name())
+	for _, f := range d.fileDiffs {
+		if err := f.Apply(); err != nil {
+			return err
+		}
 	}
+	if d.after != d.before {
+		switch d.after {
+		case StateInstalled:
+			if err := d.module.Install(); err != nil {
+				return err
+			}
+		case StateUpdated:
+			if err := d.module.Update(); err != nil {
+				return err
+			}
+		case StateUninstalled:
+			return fmt.Errorf("uninstallation is currently not supported")
+		default:
+			return fmt.Errorf("cannot support state 0x%X for module %s", d.after, d.module.Name())
+		}
+	}
+	if len(d.fileDiffs) > 0 {
+		return d.module.AfterFileChange()
+	}
+	return nil
 }

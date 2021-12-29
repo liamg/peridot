@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/template"
@@ -12,6 +13,32 @@ import (
 type File interface {
 	Target() string
 	RenderTemplate() (string, error)
+}
+
+func NewMemoryFile(target string, template string, vars map[string]interface{}) File {
+	return &memoryFile{
+		target:    target,
+		template:  template,
+		variables: vars,
+	}
+}
+
+func (m *memoryFile) Target() string {
+	return m.target
+}
+
+func (m *memoryFile) RenderTemplate() (string, error) {
+	buffer := bytes.NewBufferString("")
+	if err := template.Apply(strings.NewReader(m.template), buffer, m.variables); err != nil {
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+type memoryFile struct {
+	target    string
+	template  string
+	variables map[string]interface{}
 }
 
 type localFile struct {

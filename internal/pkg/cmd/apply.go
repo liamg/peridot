@@ -1,47 +1,42 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/liamg/peridot/internal/pkg/module"
+	"github.com/liamg/tml"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	applyCmd := &cobra.Command{
 		Use:   "apply",
-		Short: "Compare the desired state as dictated by your peridot templates and config files with the actual local state.",
+		Short: "Apply all required changes as dictated by the current configuration. You can preview changes first with the 'diff' command.",
 		Run: func(cmd *cobra.Command, args []string) {
 			root, err := module.LoadRoot()
 			if err != nil {
 				fail(err)
 			}
 
-			moduleDiffs, fileDiffs, err := root.Diff()
+			diffs, err := module.Diff(root)
 			if err != nil {
 				fail(err)
 			}
 
-			changeCount := len(moduleDiffs) + len(fileDiffs)
+			changeCount := len(diffs)
 
 			if changeCount == 0 {
-				fmt.Println("Nothing to do, no changes necessary.")
+				tml.Println("<yellow><bold>Nothing to do, no changes necessary.</bold></yellow>")
 				return
 			}
 
-			for _, fileDiff := range fileDiffs {
-				if err := fileDiff.Apply(); err != nil {
-					fail(err)
-				}
-			}
-
-			for _, moduleDiff := range moduleDiffs {
+			for _, moduleDiff := range diffs {
+				tml.Printf("<yellow><bold>[Module %s] Applying changes...", moduleDiff.Module().Name())
 				if err := moduleDiff.Apply(); err != nil {
 					fail(err)
 				}
+				tml.Printf("\x1b[2K\r<green>[Module %s] Changes applied.\n", moduleDiff.Module().Name())
 			}
 
-			fmt.Printf("\n%d changes applied successfully.", changeCount)
+			tml.Printf("\n<green><bold>%d modules applied successfully.</bold></green>\n", changeCount)
 		},
 	}
 	rootCmd.AddCommand(applyCmd)

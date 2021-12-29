@@ -45,5 +45,6 @@ Variables for a module come from the module defaults, the parent modules variabl
 
 Global overrides are looked at first, then configured values, then defaults. If no value is found, a template error will occur and execution will fail.
 
-Load config -> read innermodules and vars. 
-For each inner module, parse the input variables from the actual module, merge these defaults with the inner module values, and finally merge with the global overrides (these are namespaced by module.)
+## TODO
+
+- update/publish mapped to git pull && apply/git commit && git push

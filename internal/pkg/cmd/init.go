@@ -1,11 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/module"
+	"github.com/liamg/tml"
 	"github.com/spf13/cobra"
 )
 
@@ -31,7 +31,7 @@ func init() {
 			if err != nil {
 				fail(err)
 			}
-			fmt.Printf("New configuration file initialised at %s\n", path)
+			tml.Printf("<green><bold>New configuration file initialised at %s</bold></green>\n", path)
 		},
 	}
 	initCmd.Flags().BoolVarP(&force, "force", "f", force, "Force peridot to overwrite an existing config and reinitialise a fresh one.")

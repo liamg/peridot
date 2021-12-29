@@ -21,6 +21,7 @@ type Scripts struct {
 	Update          string `yaml:"update"`
 	InstallRequired string `yaml:"should_install"`
 	Install         string `yaml:"install"`
+	AfterFileChange string `yaml:"after_file_change"`
 }
 
 type InnerModule struct {
@@ -69,6 +70,9 @@ func (m *Module) Validate() error {
 		return fmt.Errorf("module '%s' has a should_update script defined, but no update script", m.Name)
 	} else if m.Scripts.Update != "" && m.Scripts.UpdateRequired == "" {
 		return fmt.Errorf("module '%s' has an update script defined, but no should_update script", m.Name)
+	}
+	if m.Scripts.AfterFileChange != "" && len(m.Files) == 0 {
+		return fmt.Errorf("module '%s' has an after_file_change script defined, but has no files configured", m.Name)
 	}
 
 	return nil

@@ -46,9 +46,8 @@ func loadModule(conf config.Module, combined map[string]interface{}, override *c
 	}
 
 	if err := mod.Validate(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("validation error in module '%s': %w", mod.conf.Name, err)
 	}
-
 	return &mod, nil
 }
 
@@ -72,7 +71,10 @@ func loadModuleFromSource(info config.InnerModule, parent config.Module, overrid
 	var path string
 
 	switch {
-	case strings.HasPrefix(info.Source, "./"):
+	case strings.HasPrefix(info.Source, "builtin:"): // builtin modules
+		combined := mergeVars(nil, config.BaseVariables(), info.Variables, override.Variables[info.Name])
+		return loadBuiltin(info.Source[8:], info.Name, combined)
+	case strings.HasPrefix(info.Source, "./"): // locally defined modules
 		var err error
 		path, err = filepath.Abs(filepath.Join(parent.Dir, info.Source))
 		if err != nil {
