@@ -30,7 +30,7 @@ twitter_username: liam-galvin
 github_username:  liamg
 
 # Build settings
-remote_theme: tomjoht/documentation-theme-jekyll
+remote_theme: pmarsceill/just-the-docs
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
