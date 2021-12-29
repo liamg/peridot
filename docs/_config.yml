@@ -33,6 +33,7 @@ github_username:  liamg
 remote_theme: tomjoht/documentation-theme-jekyll
 plugins:
   - jekyll-feed
+  - jekyll-remote-theme
 
 # Exclude from processing.
 # The following items will not be processed, by default.
