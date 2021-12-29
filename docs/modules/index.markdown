@@ -58,4 +58,4 @@ The `filters` property allows the following:
 |--------|-------------|-----------------|
 | os     | Operating System | `aix, android, darwin, dragonfly, freebsd, hurd, illumos, ios, js, linux, nacl, netbsd, openbsd, plan9, solaris, windows, zos` |
 | distro | Linux Distribution (empty if not Linux) | `arch, centos, debian, fedora, ubuntu, rhel` (and others, dependant on content of `ID` in `/etc/os-release`) |
-| arch   | | `386, amd64, amd64p32, arm, arm64, arm64be, armbe, loong64, mips, mips64, mips64le, mips64p32, mips64p32le, mipsle, ppc, ppc64, ppc64le, riscv, riscv64, s390, s390x, sparc, sparc64, wasm`
+| arch   | System Architecture | `386, amd64, amd64p32, arm, arm64, arm64be, armbe, loong64, mips, mips64, mips64le, mips64p32, mips64p32le, mipsle, ppc, ppc64, ppc64le, riscv, riscv64, s390, s390x, sparc, sparc64, wasm`
