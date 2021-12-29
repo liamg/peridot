@@ -30,7 +30,7 @@ twitter_username: liam-galvin
 github_username:  liamg
 
 # Build settings
-theme: jekyll-theme-minimal
+theme: jekyll-theme-slate
 plugins:
   - jekyll-feed
 
