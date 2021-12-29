@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/module"
@@ -19,7 +18,7 @@ func init() {
 			root, err := module.LoadRoot()
 			if err == nil {
 				if force {
-					if err := os.RemoveAll(filepath.Dir(root.Path())); err != nil {
+					if err := os.RemoveAll(root.Path()); err != nil {
 						fail(err)
 					}
 				} else {

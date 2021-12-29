@@ -20,7 +20,7 @@ func LoadRoot() (Module, error) {
 func loadModule(conf config.Module, combined map[string]interface{}, override *config.Override) (Module, error) {
 
 	if conf.Name == "" {
-		conf.Name = filepath.Base(filepath.Dir(conf.Dir))
+		conf.Name = filepath.Base(conf.Dir)
 	}
 
 	mod := module{
