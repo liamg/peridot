@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Built-in Modules
+title: Custom Modules
 nav_order: 3
 parent: Modules
 ---

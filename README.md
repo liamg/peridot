@@ -9,4 +9,7 @@ Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/gu
 ## TODO
 
 - update/publish mapped to git pull && apply/git commit && git push
-- add a gif to the readme
+- add a gif to the readme + docs
+- finish documentation
+- write contribution guide
+- add more useful builtins
