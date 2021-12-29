@@ -15,7 +15,7 @@ type Config struct {
 }
 
 type Override struct {
-	Variables map[string]map[string]interface{} `yaml:"variables"`
+	Variables map[string]interface{} `yaml:"variables"`
 }
 
 func ParseRoot() (*Module, *Override, error) {

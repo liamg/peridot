@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/liamg/peridot/internal/pkg/config"
+	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
 type Module interface {
@@ -24,7 +25,7 @@ type module struct {
 	conf      config.Module
 	children  []Module
 	files     []File
-	variables map[string]interface{}
+	variables variable.Collection
 }
 
 func (m *module) Name() string {
@@ -85,7 +86,7 @@ func (m *module) Validate() error {
 		if !v.Required {
 			continue
 		}
-		if _, ok := m.variables[v.Name]; !ok {
+		if !m.variables.Has(v.Name) {
 			return fmt.Errorf("module '%s' is missing a required variable '%s'", m.Name(), v.Name)
 		}
 	}

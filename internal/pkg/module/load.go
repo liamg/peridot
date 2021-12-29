@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/liamg/peridot/internal/pkg/config"
+	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
 func LoadRoot() (Module, error) {
@@ -17,7 +18,7 @@ func LoadRoot() (Module, error) {
 	return loadModule(*rootConfig, config.BaseVariables(), override)
 }
 
-func loadModule(conf config.Module, combined map[string]interface{}, override *config.Override) (Module, error) {
+func loadModule(conf config.Module, combined variable.Collection, override *config.Override) (Module, error) {
 
 	if conf.Name == "" {
 		conf.Name = filepath.Base(conf.Dir)
@@ -38,6 +39,9 @@ func loadModule(conf config.Module, combined map[string]interface{}, override *c
 	}
 
 	for _, childInfo := range conf.Modules {
+		if !filtersMatch(childInfo.Filters) {
+			continue
+		}
 		child, err := loadModuleFromSource(childInfo, conf, override)
 		if err != nil {
 			return nil, err
@@ -51,16 +55,16 @@ func loadModule(conf config.Module, combined map[string]interface{}, override *c
 	return &mod, nil
 }
 
-func mergeVars(defaults []config.Variable, base, configured, overrides map[string]interface{}) map[string]interface{} {
-	merged := make(map[string]interface{})
+func mergeVars(defaults []config.Variable, base, configured, overrides variable.Collection) variable.Collection {
+	merged := variable.NewCollection(nil)
 	for _, def := range defaults {
 		if !def.Required {
-			merged[def.Name] = def.Default
+			merged.Set(def.Name, def.Default)
 		}
 	}
-	for _, m := range []map[string]interface{}{base, configured, overrides} {
-		for key, val := range m {
-			merged[key] = val
+	for _, m := range []variable.Collection{base, configured, overrides} {
+		for key, val := range m.AsMap() {
+			merged.Set(key, val)
 		}
 	}
 	return merged
@@ -72,7 +76,12 @@ func loadModuleFromSource(info config.InnerModule, parent config.Module, overrid
 
 	switch {
 	case strings.HasPrefix(info.Source, "builtin:"): // builtin modules
-		combined := mergeVars(nil, config.BaseVariables(), info.Variables, override.Variables[info.Name])
+		combined := mergeVars(
+			nil,
+			config.BaseVariables(),
+			variable.NewCollection(info.Variables),
+			variable.NewCollection(override.Variables).Get(info.Name).AsCollection(),
+		)
 		return loadBuiltin(info.Source[8:], info.Name, combined)
 	case strings.HasPrefix(info.Source, "./"): // locally defined modules
 		var err error
@@ -91,7 +100,12 @@ func loadModuleFromSource(info config.InnerModule, parent config.Module, overrid
 		return nil, err
 	}
 
-	combined := mergeVars(variableDefaults, config.BaseVariables(), info.Variables, override.Variables[info.Name])
+	combined := mergeVars(
+		variableDefaults,
+		config.BaseVariables(),
+		variable.NewCollection(info.Variables),
+		variable.NewCollection(override.Variables).Get(info.Name).AsCollection(),
+	)
 
 	conf, err := config.Parse(path, combined)
 	if err != nil {

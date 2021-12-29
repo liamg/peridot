@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/liamg/peridot/internal/pkg/template"
+	"github.com/liamg/peridot/internal/pkg/variable"
 	"gopkg.in/yaml.v3"
 )
 
@@ -23,7 +24,7 @@ func ParseVariables(path string) ([]Variable, error) {
 	return sniff.Variables, nil
 }
 
-func Parse(path string, variables map[string]interface{}) (*Module, error) {
+func Parse(path string, variables variable.Collection) (*Module, error) {
 	var m Module
 	f, err := os.Open(path)
 	if err != nil {

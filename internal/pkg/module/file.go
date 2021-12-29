@@ -8,6 +8,7 @@ import (
 
 	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/template"
+	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
 type File interface {
@@ -15,7 +16,7 @@ type File interface {
 	RenderTemplate() (string, error)
 }
 
-func NewMemoryFile(target string, template string, vars map[string]interface{}) File {
+func NewMemoryFile(target string, template string, vars variable.Collection) File {
 	return &memoryFile{
 		target:    target,
 		template:  template,
@@ -38,16 +39,16 @@ func (m *memoryFile) RenderTemplate() (string, error) {
 type memoryFile struct {
 	target    string
 	template  string
-	variables map[string]interface{}
+	variables variable.Collection
 }
 
 type localFile struct {
 	target     string
 	sourcePath string
-	variables  map[string]interface{}
+	variables  variable.Collection
 }
 
-func loadFile(modConf config.Module, fileConf config.File, combined map[string]interface{}) (File, error) {
+func loadFile(modConf config.Module, fileConf config.File, combined variable.Collection) (File, error) {
 	templatePath := filepath.Join(modConf.Dir, fileConf.Template)
 	return &localFile{
 		target:     fileConf.Target,

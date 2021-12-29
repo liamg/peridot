@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/liamg/peridot/internal/pkg/variable"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -12,9 +13,9 @@ import (
 func TestVariables(t *testing.T) {
 
 	raw := `hello {{ .test }}`
-	input := map[string]interface{}{
+	input := variable.NewCollection(map[string]interface{}{
 		"test": "world",
-	}
+	})
 	var output []byte
 	buffer := bytes.NewBuffer(output)
 	err := Apply(strings.NewReader(raw), buffer, input)

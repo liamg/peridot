@@ -1,11 +1,11 @@
 package builtin
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/liamg/peridot/internal/pkg/builtins/validate"
 	"github.com/liamg/peridot/internal/pkg/module"
+	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
 func init() {
@@ -13,7 +13,7 @@ func init() {
 }
 
 type gitBuiltin struct {
-	variables map[string]interface{}
+	variables variable.Collection
 }
 
 func (b *gitBuiltin) Name() string {
@@ -31,7 +31,7 @@ func (b *gitBuiltin) Children() []module.Module {
 func (b *gitBuiltin) Files() []module.File {
 	var files []module.File
 
-	home := b.variables["user_home_dir"].(string)
+	home := b.variables.Get("user_home_dir").AsString()
 
 	files = append(files, module.NewMemoryFile(
 		filepath.Join(home, ".gitignore"),
@@ -68,30 +68,12 @@ func (b *gitBuiltin) Files() []module.File {
 }
 
 func (b *gitBuiltin) Validate() error {
-
 	validator := validate.New(b.variables)
-
-	if err := validator.EnsureString("user_home_dir"); err != nil {
-		return fmt.Errorf("no home directory available, cannot determine git config location")
-	}
-
-	if err := validator.EnsureStrings("username", "email"); err != nil {
-		return err
-	}
-
-	if err := validator.EnsureStringIfDefined("extra"); err != nil {
-		return err
-	}
-
-	if err := validator.EnsureStringIfDefined("editor"); err != nil {
-		return err
-	}
-
-	if err := validator.EnsureStringSliceIfDefined("aliases"); err != nil {
-		return err
-	}
-
-	return nil
+	return validator.EnsureDefined(
+		"user_home_dir",
+		"username",
+		"email",
+	)
 }
 
 func (b *gitBuiltin) RequiresUpdate() bool {
@@ -114,7 +96,7 @@ func (b *gitBuiltin) AfterFileChange() error {
 	return nil
 }
 
-func (b *gitBuiltin) ApplyVariables(vars map[string]interface{}) error {
+func (b *gitBuiltin) ApplyVariables(vars variable.Collection) error {
 	b.variables = vars
 	return nil
 }

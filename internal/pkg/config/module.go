@@ -28,6 +28,7 @@ type InnerModule struct {
 	Name      string                 `yaml:"name"`
 	Source    string                 `yaml:"source"`
 	Variables map[string]interface{} `yaml:"variables"`
+	Filters   Filters                `yaml:"filters"`
 }
 
 type Variable struct {

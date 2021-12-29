@@ -3,6 +3,8 @@ package module
 import (
 	"fmt"
 	"sync"
+
+	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
 var moduleRegistry = struct {
@@ -14,7 +16,7 @@ var moduleRegistry = struct {
 
 type BuiltIn interface {
 	Module
-	ApplyVariables(vars map[string]interface{}) error
+	ApplyVariables(vars variable.Collection) error
 }
 
 func RegisterBuiltin(name string, builtin BuiltIn) {
@@ -26,7 +28,7 @@ func RegisterBuiltin(name string, builtin BuiltIn) {
 	moduleRegistry.modules[name] = builtin
 }
 
-func loadBuiltin(builtin, name string, vars map[string]interface{}) (Module, error) {
+func loadBuiltin(builtin, name string, vars variable.Collection) (Module, error) {
 	moduleRegistry.Lock()
 	defer moduleRegistry.Unlock()
 	if m, exists := moduleRegistry.modules[builtin]; exists {

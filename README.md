@@ -15,3 +15,4 @@ Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/gu
 - finish documentation
 - write contribution guide
 - add more useful builtins
+- add filters to modules
