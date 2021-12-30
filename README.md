@@ -12,6 +12,7 @@ Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/gu
 
 ## TODO
 
+- add command to output goos, goarch and distro etc. for filter accuracy
 - add `depends_on` to modules list
 - support sudo
 - add more useful builtins
