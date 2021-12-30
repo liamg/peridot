@@ -55,33 +55,18 @@ func loadModule(conf config.Module, combined variable.Collection, override *conf
 	return &mod, nil
 }
 
-func mergeVars(defaults []config.Variable, base, configured, overrides variable.Collection) variable.Collection {
-	merged := variable.NewCollection(nil)
-	for _, def := range defaults {
-		if !def.Required {
-			merged.Set(def.Name, def.Default)
-		}
-	}
-	for _, m := range []variable.Collection{base, configured, overrides} {
-		for key, val := range m.AsMap() {
-			merged.Set(key, val)
-		}
-	}
-	return merged
-}
-
 func loadModuleFromSource(info config.InnerModule, parent config.Module, override *config.Override) (Module, error) {
 
 	var path string
 
+	combined := variable.NewCollection(info.Variables)
+	if override != nil {
+		overrides := variable.NewCollection(override.Variables).Get(info.Name).AsCollection()
+		combined.MergeIn(overrides)
+	}
+
 	switch {
 	case strings.HasPrefix(info.Source, "builtin:"): // builtin modules
-		combined := mergeVars(
-			nil,
-			config.BaseVariables(),
-			variable.NewCollection(info.Variables),
-			variable.NewCollection(override.Variables).Get(info.Name).AsCollection(),
-		)
 		return loadBuiltin(info.Source[8:], info.Name, combined)
 	case strings.HasPrefix(info.Source, "./"): // locally defined modules
 		var err error
@@ -90,27 +75,25 @@ func loadModuleFromSource(info config.InnerModule, parent config.Module, overrid
 			return nil, err
 		}
 		path = filepath.Join(path, config.Filename)
+		return loadModuleFromPath(path, info.Name, combined)
 	default:
 		return nil, fmt.Errorf("invalid module source '%s' - local modules should begin with './'. "+
 			"To load external modules, use a full URL, or to use built in modules, use 'builtin:NAME'", info.Source)
 	}
+}
 
+func loadModuleFromPath(path string, name string, combined variable.Collection) (Module, error) {
 	variableDefaults, err := config.ParseVariables(path)
 	if err != nil {
 		return nil, err
 	}
 
-	combined := mergeVars(
-		variableDefaults,
-		config.BaseVariables(),
-		variable.NewCollection(info.Variables),
-		variable.NewCollection(override.Variables).Get(info.Name).AsCollection(),
-	)
+	combined = applyVariableDefaults(variableDefaults, combined)
 
 	conf, err := config.Parse(path, combined)
 	if err != nil {
 		return nil, err
 	}
-	conf.Name = info.Name
-	return loadModule(*conf, combined, override)
+	conf.Name = name
+	return loadModule(*conf, combined, nil)
 }

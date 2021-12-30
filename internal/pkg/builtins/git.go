@@ -3,46 +3,49 @@ package builtin
 import (
 	"path/filepath"
 
-	"github.com/liamg/peridot/internal/pkg/builtins/validate"
+	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/module"
 	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
 func init() {
-	module.RegisterBuiltin("git", &gitBuiltin{})
+
+	git := module.NewFactory("git").
+		WithInputs([]config.Variable{
+			{
+				Name:     "username",
+				Required: true,
+			},
+			{
+				Name:     "email",
+				Required: true,
+			},
+			{
+				Name:    "editor",
+				Default: "vim",
+			},
+			{
+				Name:    "aliases",
+				Default: []interface{}{},
+			},
+			{
+				Name: "extra",
+			},
+			{
+				Name:    "ignores",
+				Default: []interface{}{},
+			},
+		}).
+		WithFilesFunc(gitFiles).
+		Build()
+
+	module.RegisterBuiltin("git", git)
 }
 
-type gitBuiltin struct {
-	variables variable.Collection
-}
-
-func (b *gitBuiltin) Name() string {
-	return "builtin:git"
-}
-
-func (b *gitBuiltin) Path() string {
-	panic("not implemented")
-}
-
-func (b *gitBuiltin) Children() []module.Module {
-	return nil
-}
-
-func (b *gitBuiltin) Files() []module.File {
-	var files []module.File
-
-	home := b.variables.Get("user_home_dir").AsString()
-
-	files = append(files, module.NewMemoryFile(
-		filepath.Join(home, ".gitignore"),
-		`{{ range .ignores }}{{ . }}
-{{ end }}`,
-		b.variables,
-	))
-
-	files = append(files, module.NewMemoryFile(
-		filepath.Join(home, ".gitconfig"),
-		`
+var (
+	gitIgnoreTemplate = `{{ range .ignores }}{{ . }}
+{{ end }}`
+	gitConfigTemplate = `
 [user]
 	name = {{ .username }}
 	email = {{ .email }}
@@ -60,43 +63,25 @@ func (b *gitBuiltin) Files() []module.File {
 {{range .aliases}}	{{ . }}
 {{end}}
 {{ if .extra }}{{ .extra }}{{ end }}
-`,
-		b.variables,
+`
+)
+
+func gitFiles(vars variable.Collection) []module.File {
+	var files []module.File
+
+	home := vars.Get("user_home_dir").AsString()
+
+	files = append(files, module.NewMemoryFile(
+		filepath.Join(home, ".gitignore"),
+		gitIgnoreTemplate,
+		vars,
+	))
+
+	files = append(files, module.NewMemoryFile(
+		filepath.Join(home, ".gitconfig"),
+		gitConfigTemplate,
+		vars,
 	))
 
 	return files
-}
-
-func (b *gitBuiltin) Validate() error {
-	validator := validate.New(b.variables)
-	return validator.EnsureDefined(
-		"user_home_dir",
-		"username",
-		"email",
-	)
-}
-
-func (b *gitBuiltin) RequiresUpdate() bool {
-	return false
-}
-
-func (b *gitBuiltin) RequiresInstall() bool {
-	return false
-}
-
-func (b *gitBuiltin) Install() error {
-	return nil
-}
-
-func (b *gitBuiltin) Update() error {
-	return nil
-}
-
-func (b *gitBuiltin) AfterFileChange() error {
-	return nil
-}
-
-func (b *gitBuiltin) ApplyVariables(vars variable.Collection) error {
-	b.variables = vars
-	return nil
 }

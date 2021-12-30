@@ -11,6 +11,7 @@ type Variable interface {
 	AsFloat64() float64
 	AsCollection() Collection
 	AsList() List
+	Interface() interface{}
 }
 
 type variable struct {
@@ -21,6 +22,10 @@ func New(raw interface{}) Variable {
 	return &variable{
 		raw: raw,
 	}
+}
+
+func (v *variable) Interface() interface{} {
+	return v.raw
 }
 
 func (v *variable) AsString() string {

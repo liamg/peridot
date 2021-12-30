@@ -16,7 +16,7 @@ var moduleRegistry = struct {
 
 type BuiltIn interface {
 	Module
-	ApplyVariables(vars variable.Collection) error
+	ApplyVariables(vars variable.Collection)
 }
 
 func RegisterBuiltin(name string, builtin BuiltIn) {
@@ -32,9 +32,7 @@ func loadBuiltin(builtin, name string, vars variable.Collection) (Module, error)
 	moduleRegistry.Lock()
 	defer moduleRegistry.Unlock()
 	if m, exists := moduleRegistry.modules[builtin]; exists {
-		if err := m.ApplyVariables(vars); err != nil {
-			return nil, err
-		}
+		m.ApplyVariables(vars)
 		if err := m.Validate(); err != nil {
 			return nil, err
 		}
