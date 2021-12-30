@@ -4,7 +4,7 @@ User environment management for Linux/OSX. Think Terraform for your dotfiles and
 
 Allows the templating of any configuration file to provide automatic tweaking of configuration on apply.
 
-If you struggle with maintaining your dotfiles in one big git repository and/or sharing them across multiple machines, Peridot is for you.
+If you struggle with maintaining your dotfiles, sharing them across multiple machines, and/or tweaking configurations for different machine setups, Peridot is for you.
 
 ## Documentation
 
