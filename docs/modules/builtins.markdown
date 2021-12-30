@@ -24,6 +24,22 @@ The following set of built-in modules in currently available.
 
 Manages your Git configuration (`~/.gitconfig`) and your global git ignore patterns (`~/.gitignore`).
 
+## `builtin:font`
+
+## `builtin:packages: apt, pacman, aur? etc.`
+
+## `builtin:go`
+
+## `builtin:gopkg`
+
+## `builtin:rust`
+
+## `builtin:wallpaper`
+x/wayland
+
+## `builtin:zsh`
+with ohmyzsh, p10k
+
 ### Variables
 
 | Name        | Required | Default    | Description |

@@ -12,8 +12,11 @@ Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/gu
 
 ## TODO
 
+- add `depends_on` to modules list
+- support sudo
+- add more useful builtins
 - update/publish mapped to git pull && apply/git commit && git push
 - add a gif to the readme + docs
 - finish documentation
 - write contribution guide
-- add more useful builtins
+- add `upgrade` command to update peridot binary
