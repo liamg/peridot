@@ -9,15 +9,3 @@ If you struggle with maintaining your dotfiles, sharing them across multiple mac
 ## Documentation
 
 Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/guide).
-
-## TODO
-
-- add command to output goos, goarch and distro etc. for filter accuracy
-- add `depends_on` to modules list
-- support sudo
-- add more useful builtins
-- update/publish mapped to git pull && apply/git commit && git push
-- add a gif to the readme + docs
-- finish documentation
-- write contribution guide
-- add `upgrade` command to update peridot binary
