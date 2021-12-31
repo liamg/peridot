@@ -9,10 +9,15 @@ import (
 )
 
 type baseBuiltin struct {
-	name      string
-	inputs    []config.Variable
-	variables variable.Collection
-	filesFunc func(variable.Collection) []File
+	name                string
+	inputs              []config.Variable
+	variables           variable.Collection
+	filesFunc           func(variable.Collection) []File
+	requiresInstallFunc func() bool
+	requiresUpdateFunc  func() bool
+	installFunc         func() error
+	updateFunc          func() error
+	afterFileChangeFunc func() error
 }
 
 func (b *baseBuiltin) Name() string {
@@ -39,23 +44,38 @@ func (b *baseBuiltin) Validate() error {
 }
 
 func (b *baseBuiltin) RequiresUpdate() bool {
-	return false
+	if b.requiresUpdateFunc == nil {
+		return false
+	}
+	return b.requiresUpdateFunc()
 }
 
 func (b *baseBuiltin) RequiresInstall() bool {
-	return false
+	if b.requiresInstallFunc == nil {
+		return false
+	}
+	return b.requiresInstallFunc()
 }
 
 func (b *baseBuiltin) Install() error {
-	return nil
+	if b.installFunc == nil {
+		return fmt.Errorf("install handler not implemented")
+	}
+	return b.installFunc()
 }
 
 func (b *baseBuiltin) Update() error {
-	return nil
+	if b.updateFunc == nil {
+		return fmt.Errorf("update handler not implemented")
+	}
+	return b.updateFunc()
 }
 
 func (b *baseBuiltin) AfterFileChange() error {
-	return nil
+	if b.afterFileChangeFunc == nil {
+		return nil
+	}
+	return b.afterFileChangeFunc()
 }
 
 func (b *baseBuiltin) ApplyVariables(vars variable.Collection) {
