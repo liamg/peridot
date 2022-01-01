@@ -27,6 +27,7 @@ type Scripts struct {
 type InnerModule struct {
 	Name      string                 `yaml:"name"`
 	Source    string                 `yaml:"source"`
+	DependsOn []string               `yaml:"depends_on"`
 	Variables map[string]interface{} `yaml:"variables"`
 	Filters   Filters                `yaml:"filters"`
 }
