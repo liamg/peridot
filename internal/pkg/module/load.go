@@ -38,7 +38,12 @@ func loadModule(conf config.Module, combined variable.Collection, override *conf
 		mod.files = append(mod.files, file)
 	}
 
-	for _, childInfo := range conf.Modules {
+	sorted, err := sortDependencies(conf.Modules)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, childInfo := range sorted {
 		if !filtersMatch(childInfo.Filters) {
 			continue
 		}
