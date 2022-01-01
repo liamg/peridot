@@ -17,6 +17,7 @@ var moduleRegistry = struct {
 type BuiltIn interface {
 	Module
 	ApplyVariables(vars variable.Collection)
+	Clone(name string) BuiltIn
 }
 
 func RegisterBuiltin(name string, builtin BuiltIn) {
@@ -32,11 +33,12 @@ func loadBuiltin(builtin, name string, vars variable.Collection) (Module, error)
 	moduleRegistry.Lock()
 	defer moduleRegistry.Unlock()
 	if m, exists := moduleRegistry.modules[builtin]; exists {
-		m.ApplyVariables(vars)
-		if err := m.Validate(); err != nil {
+		clone := m.Clone(name)
+		clone.ApplyVariables(vars)
+		if err := clone.Validate(); err != nil {
 			return nil, err
 		}
-		return m, nil
+		return clone, nil
 	}
 	return nil, fmt.Errorf("builtin module does not exist: '%s'", name)
 }
