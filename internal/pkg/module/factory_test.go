@@ -9,7 +9,7 @@ import (
 func TestFactorySetsModuleName(t *testing.T) {
 	factory := NewFactory("example")
 	built := factory.Build()
-	assert.Equal(t, "builtin:example", built.Name())
+	assert.Equal(t, "example", built.Name())
 }
 
 func TestFactorySetsHandlers(t *testing.T) {
