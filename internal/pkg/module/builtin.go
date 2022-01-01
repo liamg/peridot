@@ -21,7 +21,16 @@ type baseBuiltin struct {
 }
 
 func (b *baseBuiltin) Name() string {
-	return fmt.Sprintf("builtin:%s", b.name)
+	return b.name
+}
+
+func (b *baseBuiltin) Clone(name string) BuiltIn {
+	if b == nil {
+		return nil
+	}
+	c := *b
+	c.name = name
+	return &c
 }
 
 func (b *baseBuiltin) Path() string {

@@ -1,6 +1,7 @@
 package module
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -20,6 +21,7 @@ type ModuleDiff interface {
 	After() State
 	Print(withContent bool)
 	Apply() error
+	Files() []FileDiff
 }
 
 type FileDiff interface {
@@ -92,12 +94,35 @@ func Diff(m Module) ([]ModuleDiff, error) {
 		})
 	}
 
+	uniqueChildren := make(map[string]struct{})
 	for _, mod := range m.Children() {
+		if _, exists := uniqueChildren[mod.Name()]; exists {
+			return nil, fmt.Errorf("error in module '%s': multiple modules defined with the same name ('%s')", m.Name(), mod.Name())
+		}
+		uniqueChildren[mod.Name()] = struct{}{}
 		m, err := Diff(mod)
 		if err != nil {
 			return nil, err
 		}
 		moduleDiffs = append(moduleDiffs, m...)
+	}
+
+	var combinedDiffs []FileDiff
+	for _, m := range moduleDiffs {
+		combinedDiffs = append(combinedDiffs, m.Files()...)
+	}
+
+	filenames := make(map[string]string)
+	for _, diff := range combinedDiffs {
+		if existing, ok := filenames[diff.Path()]; ok {
+			return nil, fmt.Errorf(
+				"file '%s' must only be managed by a single module, but it is managed by both '%s' and '%s'",
+				diff.Path(),
+				existing,
+				diff.Module().Name(),
+			)
+		}
+		filenames[diff.Path()] = diff.Module().Name()
 	}
 
 	return moduleDiffs, nil

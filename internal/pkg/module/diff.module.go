@@ -13,6 +13,10 @@ type moduleDiff struct {
 	after     State
 }
 
+func (d *moduleDiff) Files() []FileDiff {
+	return d.fileDiffs
+}
+
 func (d *moduleDiff) Module() Module {
 	return d.module
 }
