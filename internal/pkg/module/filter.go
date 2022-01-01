@@ -1,10 +1,13 @@
 package module
 
-import "github.com/liamg/peridot/internal/pkg/config"
+import (
+	"github.com/liamg/peridot/internal/pkg/config"
+	"github.com/liamg/peridot/internal/pkg/system"
+)
 
 func filtersMatch(filters config.Filters) bool {
 
-	sysInfo := gatherSystemInfo()
+	sysInfo := system.Info()
 
 	if len(filters.Architecture) > 0 {
 		var found bool

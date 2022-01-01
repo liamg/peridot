@@ -1,4 +1,4 @@
-package module
+package system
 
 import (
 	"os"
@@ -14,7 +14,7 @@ type systemInfo struct {
 
 var systemInfoCache *systemInfo
 
-func gatherSystemInfo() systemInfo {
+func Info() systemInfo {
 	if systemInfoCache == nil {
 		systemInfoCache = &systemInfo{
 			OperatingSystem: runtime.GOOS,
