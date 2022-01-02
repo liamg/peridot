@@ -12,6 +12,10 @@ func TestNew(t *testing.T) {
 		input interface{}
 	}{
 		{
+			name:  "bool",
+			input: true,
+		},
+		{
 			name:  "int",
 			input: 123,
 		},
@@ -54,6 +58,11 @@ func Test_variable_AsString(t *testing.T) {
 			name:  "string",
 			input: "hello world",
 			want:  "hello world",
+		},
+		{
+			name:  "bool",
+			input: true,
+			want:  "true",
 		},
 		{
 			name:  "int",
@@ -104,6 +113,16 @@ func Test_variable_AsInteger(t *testing.T) {
 			name:  "int",
 			input: 123,
 			want:  123,
+		},
+		{
+			name:  "bool false",
+			input: false,
+			want:  0,
+		},
+		{
+			name:  "bool true",
+			input: true,
+			want:  1,
 		},
 		{
 			name:  "string",
@@ -191,6 +210,16 @@ func Test_variable_AsFloat(t *testing.T) {
 			want:  1.23,
 		},
 		{
+			name:  "bool false",
+			input: false,
+			want:  0.0,
+		},
+		{
+			name:  "bool true",
+			input: true,
+			want:  1.0,
+		},
+		{
 			name:  "int",
 			input: 123,
 			want:  123.0,
@@ -250,6 +279,34 @@ func Test_variable_AsList(t *testing.T) {
 			},
 		},
 		{
+			name: "[]float64",
+			input: []float64{
+				5.1,
+				6.1,
+				7.1,
+			},
+			wantLen: 3,
+			wantValues: []interface{}{
+				5.1,
+				6.1,
+				7.1,
+			},
+		},
+		{
+			name: "[]bool",
+			input: []bool{
+				true,
+				false,
+				true,
+			},
+			wantLen: 3,
+			wantValues: []interface{}{
+				true,
+				false,
+				true,
+			},
+		},
+		{
 			name: "[]interface{}",
 			input: []interface{}{
 				"a",
@@ -262,6 +319,12 @@ func Test_variable_AsList(t *testing.T) {
 				123,
 				"c",
 			},
+		},
+		{
+			name:       "nil",
+			input:      nil,
+			wantLen:    0,
+			wantValues: []interface{}{},
 		},
 	}
 	for _, tt := range tests {

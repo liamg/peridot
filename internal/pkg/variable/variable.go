@@ -78,6 +78,10 @@ func (v *variable) AsInteger() int {
 		return c
 	case float64:
 		return int(c)
+	case bool:
+		if c {
+			return 1
+		}
 	case string:
 		if i, err := strconv.Atoi(c); err == nil {
 			return i
@@ -90,6 +94,10 @@ func (v *variable) AsFloat64() float64 {
 	switch c := v.raw.(type) {
 	case int:
 		return float64(c)
+	case bool:
+		if c {
+			return 1
+		}
 	case float64:
 		return c
 	case string:
@@ -135,9 +143,6 @@ func (v *variable) AsList() List {
 			anon = append(anon, s)
 		}
 		return List(anon)
-	}
-	if m, ok := v.raw.([]interface{}); ok {
-		return List(m)
 	}
 	return List([]interface{}{})
 }
