@@ -3,12 +3,14 @@ package variable
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 type Variable interface {
 	AsString() string
 	AsInteger() int
 	AsFloat64() float64
+	AsBool() bool
 	AsCollection() Collection
 	AsList() List
 	Interface() interface{}
@@ -28,8 +30,46 @@ func (v *variable) Interface() interface{} {
 	return v.raw
 }
 
+func (v *variable) AsBool() bool {
+	switch actual := v.raw.(type) {
+	case bool:
+		return actual
+	case string:
+		return actual != ""
+	case int:
+		return actual > 0
+	case float64:
+		return actual > 0
+	}
+	return false
+}
+
 func (v *variable) AsString() string {
-	return fmt.Sprintf("%s", v.raw)
+	switch actual := v.raw.(type) {
+	case bool:
+		return fmt.Sprintf("%t", actual)
+	case string:
+		return actual
+	case int:
+		return fmt.Sprintf("%d", actual)
+	case float64:
+		return fmt.Sprintf("%f", actual)
+	case []int:
+		var out []string
+		for _, a := range actual {
+			out = append(out, fmt.Sprintf("%d", a))
+		}
+		return fmt.Sprintf("[%s]", strings.Join(out, ", "))
+	case []float64:
+		var out []string
+		for _, a := range actual {
+			out = append(out, fmt.Sprintf("%f", a))
+		}
+		return fmt.Sprintf("[%s]", strings.Join(out, ", "))
+	case []string:
+		return fmt.Sprintf(`["%s"]`, strings.Join(actual, `", "`))
+	}
+	return fmt.Sprintf("%v", v.raw)
 }
 
 func (v *variable) AsInteger() int {
@@ -68,6 +108,34 @@ func (v *variable) AsCollection() Collection {
 }
 
 func (v *variable) AsList() List {
+	switch actual := v.raw.(type) {
+	case []interface{}:
+		return List(actual)
+	case []string:
+		var anon []interface{}
+		for _, s := range actual {
+			anon = append(anon, s)
+		}
+		return List(anon)
+	case []float64:
+		var anon []interface{}
+		for _, s := range actual {
+			anon = append(anon, s)
+		}
+		return List(anon)
+	case []bool:
+		var anon []interface{}
+		for _, s := range actual {
+			anon = append(anon, s)
+		}
+		return List(anon)
+	case []int:
+		var anon []interface{}
+		for _, s := range actual {
+			anon = append(anon, s)
+		}
+		return List(anon)
+	}
 	if m, ok := v.raw.([]interface{}); ok {
 		return List(m)
 	}
