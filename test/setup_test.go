@@ -144,12 +144,12 @@ func startContainer(image string) (*testContainer, error) {
 		}
 	}
 	if !found {
-		fmt.Printf("Pulling image '%s'...", image)
+		fmt.Printf("Pulling image '%s'...\n", image)
 		reader, err := cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
 		if err != nil {
 			return nil, err
 		}
-		_ = reader.Close()
+		_, _ = io.Copy(io.Discard, reader)
 		time.Sleep(time.Second)
 	}
 
