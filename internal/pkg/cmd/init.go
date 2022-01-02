@@ -25,7 +25,7 @@ func init() {
 					fail("Configuration already exists. Use --force to completely remove all peridot config and create a blank config.")
 				}
 			} else if !os.IsNotExist(err) {
-				fail(err)
+				fail("Configuration already exists. Use --force to completely remove all peridot config and create a blank config.")
 			}
 			path, err := config.Init()
 			if err != nil {
