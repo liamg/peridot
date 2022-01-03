@@ -73,12 +73,14 @@ func gitFiles(vars variable.Collection) []module.File {
 	files = append(files, module.NewMemoryFile(
 		filepath.Join(home, ".gitignore"),
 		gitIgnoreTemplate,
+		true,
 		vars,
 	))
 
 	files = append(files, module.NewMemoryFile(
 		filepath.Join(home, ".gitconfig"),
 		gitConfigTemplate,
+		true,
 		vars,
 	))
 

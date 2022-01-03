@@ -44,8 +44,9 @@ type Variable struct {
 }
 
 type File struct {
-	Target   string `yaml:"target"`
-	Template string `yaml:"template"`
+	Target            string `yaml:"target"`
+	Source            string `yaml:"source"`
+	DisableTemplating bool   `yaml:disable_templating`
 }
 
 func (m *Module) Validate() error {

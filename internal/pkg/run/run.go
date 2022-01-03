@@ -1,7 +1,6 @@
 package run
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 
@@ -22,7 +21,7 @@ func Run(command string, dir string, sudo bool) error {
 
 func createCommand(command string, sudo bool) *exec.Cmd {
 	if sudo {
-		command = fmt.Sprintf("sudo %s", command)
+		return exec.Command("sudo", "sh", "-c", command)
 	}
 	return exec.Command("sh", "-c", command)
 }

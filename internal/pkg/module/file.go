@@ -2,6 +2,7 @@ package module
 
 import (
 	"bytes"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,11 +17,12 @@ type File interface {
 	RenderTemplate() (string, error)
 }
 
-func NewMemoryFile(target string, template string, vars variable.Collection) File {
+func NewMemoryFile(target string, template string, enableTemplating bool, vars variable.Collection) File {
 	return &memoryFile{
-		target:    target,
-		template:  template,
-		variables: vars,
+		target:           target,
+		template:         template,
+		variables:        vars,
+		enableTemplating: enableTemplating,
 	}
 }
 
@@ -29,6 +31,9 @@ func (m *memoryFile) Target() string {
 }
 
 func (m *memoryFile) RenderTemplate() (string, error) {
+	if !m.enableTemplating {
+		return m.template, nil
+	}
 	buffer := bytes.NewBufferString("")
 	if err := template.Apply(strings.NewReader(m.template), buffer, m.variables); err != nil {
 		return "", err
@@ -37,23 +42,26 @@ func (m *memoryFile) RenderTemplate() (string, error) {
 }
 
 type memoryFile struct {
-	target    string
-	template  string
-	variables variable.Collection
+	target           string
+	template         string
+	variables        variable.Collection
+	enableTemplating bool
 }
 
 type localFile struct {
 	target     string
 	sourcePath string
 	variables  variable.Collection
+	templating bool
 }
 
 func loadFile(modConf config.Module, fileConf config.File, combined variable.Collection) (File, error) {
-	templatePath := filepath.Join(modConf.Dir, fileConf.Template)
+	templatePath := filepath.Join(modConf.Dir, fileConf.Source)
 	return &localFile{
 		target:     fileConf.Target,
 		sourcePath: templatePath,
 		variables:  combined,
+		templating: !fileConf.DisableTemplating,
 	}, nil
 }
 
@@ -67,6 +75,13 @@ func (l *localFile) RenderTemplate() (string, error) {
 		return "", err
 	}
 	defer func() { _ = f.Close() }()
+	if !l.templating {
+		data, err := ioutil.ReadAll(f)
+		if err != nil {
+			return "", err
+		}
+		return string(data), nil
+	}
 	buffer := bytes.NewBufferString("")
 	if err := template.Apply(f, buffer, l.variables); err != nil {
 		return "", err

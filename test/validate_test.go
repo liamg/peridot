@@ -45,7 +45,7 @@ modules:
 
 			require.NoError(t, c.WriteConfig(test.config))
 
-			output, exit, err := c.Run("peridot", "validate", "--no-ansi")
+			output, exit, err := c.RunAsUser("peridot", "validate", "--no-ansi")
 			require.NoError(t, err)
 			if test.wantErr {
 				require.NotEqual(t, 0, exit, output)

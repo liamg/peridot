@@ -19,7 +19,7 @@ func TestSystemCommand(t *testing.T) {
 	defer c.Stop()
 
 	// run system command
-	output, exit, err := c.Run("peridot", "system", "--no-ansi")
+	output, exit, err := c.RunAsUser("peridot", "system", "--no-ansi")
 	require.NoError(t, err)
 	require.Equal(t, 0, exit, output)
 
