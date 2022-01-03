@@ -99,10 +99,17 @@ func (t *testContainer) WriteHomeFile(relativePath, content string) error {
 	if err := os.MkdirAll(filepath.Join(t.hostDir, filepath.Dir(relativePath)), 0777); err != nil {
 		return err
 	}
+	_, exit, err := t.RunAsRoot("chown", "-R", defaultUser, "/home/"+defaultUser)
+	if err != nil {
+		return err
+	}
+	if exit > 0 {
+		return fmt.Errorf("exit code %d", exit)
+	}
 	if err := ioutil.WriteFile(filepath.Join(t.hostDir, relativePath), []byte(content), 0777); err != nil {
 		return err
 	}
-	_, exit, err := t.RunAsRoot("chown", "-R", defaultUser, "/home/"+defaultUser)
+	_, exit, err = t.RunAsRoot("chown", "-R", defaultUser, "/home/"+defaultUser)
 	if err != nil {
 		return err
 	}
