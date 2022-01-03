@@ -186,6 +186,10 @@ func startContainer(image string) (*testContainer, error) {
 	}
 	fmt.Printf("Created temp dir at %s for %s container.\n", tmpDir, image)
 
+	if err := os.Chmod(tmpDir, 0777); err != nil {
+		return nil, err
+	}
+
 	images, err := cli.ImageList(context.Background(), types.ImageListOptions{
 		All: true,
 	})
