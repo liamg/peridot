@@ -94,6 +94,14 @@ func (m *module) AfterFileChange() error {
 }
 
 func (m *module) Validate() error {
+	for _, file := range m.conf.Files {
+		if file.Target == "" {
+			return fmt.Errorf("file has no target")
+		}
+		if file.Source == "" {
+			return fmt.Errorf("file has no source")
+		}
+	}
 	for _, v := range m.conf.Variables {
 		if !v.Required {
 			continue
