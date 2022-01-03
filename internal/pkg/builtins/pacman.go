@@ -20,18 +20,18 @@ func init() {
 		}).
 		WithRequiresInstallFunc(func(vars variable.Collection) bool {
 			for _, pkg := range vars.Get("packages").AsList().All() {
-				if err := run.Run(fmt.Sprintf("pacman -Qi %s", pkg.AsString()), "/", false); err != nil {
+				if err := run.Run(fmt.Sprintf("pacman -Qi %s", pkg.AsString()), "/", false, false); err != nil {
 					return true
 				}
 			}
 			return false
 		}).
 		WithInstallFunc(func(vars variable.Collection) error {
-			if err := run.Run("pacman -Syy", "/", true); err != nil {
+			if err := run.Run("pacman -Syy", "/", true, true); err != nil {
 				return fmt.Errorf("failed to sync package db: %s", err)
 			}
 			for _, pkg := range vars.Get("packages").AsList().All() {
-				if err := run.Run(fmt.Sprintf("pacman -Qi %s || pacman -S %s", pkg.AsString(), pkg.AsString()), "/", true); err != nil {
+				if err := run.Run(fmt.Sprintf("pacman -Qi %s || pacman -S %s", pkg.AsString(), pkg.AsString()), "/", true, true); err != nil {
 					return err
 				}
 			}

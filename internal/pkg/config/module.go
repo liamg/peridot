@@ -25,8 +25,9 @@ type Scripts struct {
 }
 
 type Script struct {
-	Command string `yaml:"command"`
-	Sudo    bool   `yaml:"sudo"`
+	Command     string `yaml:"command"`
+	Sudo        bool   `yaml:"sudo"`
+	Interactive bool   `yaml:"interactive"`
 }
 
 type InnerModule struct {
@@ -46,7 +47,7 @@ type Variable struct {
 type File struct {
 	Target            string `yaml:"target"`
 	Source            string `yaml:"source"`
-	DisableTemplating bool   `yaml:disable_templating`
+	DisableTemplating bool   `yaml:"disable_templating"`
 }
 
 func (m *Module) Validate() error {
