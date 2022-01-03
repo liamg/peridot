@@ -52,11 +52,10 @@ var (
 [commit]
 	gpgsign = true
 [core]
+	excludesfile = ~/.gitignore
 {{ if .editor }}	editor = {{ .editor }}
 {{ else }}	editor = vim
 {{ end }}
-[ignore]
-	file = ~/.gitignore
 [pull]
 	rebase = true
 [alias]

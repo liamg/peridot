@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/liamg/peridot/internal/pkg/config"
-	"github.com/liamg/peridot/internal/pkg/module"
 	"github.com/liamg/tml"
 	"github.com/spf13/cobra"
 )
@@ -15,10 +16,13 @@ func init() {
 		Use:   "init",
 		Short: "Initialises a new peridot config for the local user environment.",
 		Run: func(cmd *cobra.Command, args []string) {
-			root, err := module.LoadRoot()
-			if err == nil {
+			configPath, err := config.Path()
+			if err != nil {
+				fail(fmt.Sprintf("Cannot locate config path: %s", err))
+			}
+			if _, err := os.Stat(configPath); err == nil {
 				if force {
-					if err := os.RemoveAll(root.Path()); err != nil {
+					if err := os.RemoveAll(filepath.Dir(configPath)); err != nil {
 						fail(err)
 					}
 				} else {

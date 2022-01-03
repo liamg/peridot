@@ -22,7 +22,8 @@ type collection struct {
 }
 
 func (c *collection) Has(name string) bool {
-	return c.Get(name) != nil
+	_, ok := c.data[name]
+	return ok
 }
 
 func (c *collection) Get(name string) Variable {

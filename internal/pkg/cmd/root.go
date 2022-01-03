@@ -12,6 +12,17 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "peridot",
 	Short: "Manage dotfiles and user environments across machines, OSes, users and more.",
+	PersistentPreRun: func(_ *cobra.Command, args []string) {
+		if disableANSI {
+			tml.DisableFormatting()
+		}
+	},
+}
+
+var disableANSI bool
+
+func init() {
+	rootCmd.PersistentFlags().BoolVar(&disableANSI, "no-ansi", disableANSI, "Disable ANSI colour/formatting codes in output.")
 }
 
 func Execute() {
