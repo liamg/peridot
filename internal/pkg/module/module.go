@@ -2,9 +2,9 @@ package module
 
 import (
 	"fmt"
-	"os/exec"
 
 	"github.com/liamg/peridot/internal/pkg/config"
+	"github.com/liamg/peridot/internal/pkg/run"
 	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
@@ -45,40 +45,52 @@ func (m *module) Files() []File {
 }
 
 func (m *module) RequiresUpdate() bool {
-	if m.conf.Scripts.UpdateRequired == "" {
+	if m.conf.Scripts.UpdateRequired.Command == "" {
 		return false
 	}
-	cmd := exec.Command("sh", "-c", m.conf.Scripts.UpdateRequired)
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
+	return run.Run(
+		m.conf.Scripts.UpdateRequired.Command,
+		m.Path(),
+		m.conf.Scripts.UpdateRequired.Sudo,
+	) == nil
 }
 
 func (m *module) RequiresInstall() bool {
-	if m.conf.Scripts.InstallRequired == "" {
+	if m.conf.Scripts.InstallRequired.Command == "" {
 		return false
 	}
-	cmd := exec.Command("sh", "-c", m.conf.Scripts.InstallRequired)
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
+	return run.Run(
+		m.conf.Scripts.InstallRequired.Command,
+		m.Path(),
+		m.conf.Scripts.InstallRequired.Sudo,
+	) == nil
 }
 
 func (m *module) Install() error {
-	return exec.Command("sh", "-c", m.conf.Scripts.Install).Run()
+	return run.Run(
+		m.conf.Scripts.Install.Command,
+		m.Path(),
+		m.conf.Scripts.Install.Sudo,
+	)
 }
 
 func (m *module) Update() error {
-	return exec.Command("sh", "-c", m.conf.Scripts.Update).Run()
+	return run.Run(
+		m.conf.Scripts.Update.Command,
+		m.Path(),
+		m.conf.Scripts.Update.Sudo,
+	)
 }
 
 func (m *module) AfterFileChange() error {
-	if m.conf.Scripts.AfterFileChange == "" {
+	if m.conf.Scripts.AfterFileChange.Command == "" {
 		return nil
 	}
-	return exec.Command("sh", "-c", m.conf.Scripts.AfterFileChange).Run()
+	return run.Run(
+		m.conf.Scripts.AfterFileChange.Command,
+		m.Path(),
+		m.conf.Scripts.AfterFileChange.Sudo,
+	)
 }
 
 func (m *module) Validate() error {

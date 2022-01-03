@@ -17,11 +17,16 @@ type Module struct {
 }
 
 type Scripts struct {
-	UpdateRequired  string `yaml:"should_update"`
-	Update          string `yaml:"update"`
-	InstallRequired string `yaml:"should_install"`
-	Install         string `yaml:"install"`
-	AfterFileChange string `yaml:"after_file_change"`
+	UpdateRequired  Script `yaml:"should_update"`
+	Update          Script `yaml:"update"`
+	InstallRequired Script `yaml:"should_install"`
+	Install         Script `yaml:"install"`
+	AfterFileChange Script `yaml:"after_file_change"`
+}
+
+type Script struct {
+	Command string `yaml:"command"`
+	Sudo    bool   `yaml:"sudo"`
 }
 
 type InnerModule struct {
@@ -63,17 +68,17 @@ func (m *Module) Validate() error {
 			return fmt.Errorf("module '%s' has a child module '%s' with no source", m.Name, child.Name)
 		}
 	}
-	if m.Scripts.InstallRequired != "" && m.Scripts.Install == "" {
+	if m.Scripts.InstallRequired.Command != "" && m.Scripts.Install.Command == "" {
 		return fmt.Errorf("module '%s' has a should_install script defined, but no install script", m.Name)
-	} else if m.Scripts.Install != "" && m.Scripts.InstallRequired == "" {
+	} else if m.Scripts.Install.Command != "" && m.Scripts.InstallRequired.Command == "" {
 		return fmt.Errorf("module '%s' has an install script defined, but no should_install script", m.Name)
 	}
-	if m.Scripts.UpdateRequired != "" && m.Scripts.Update == "" {
+	if m.Scripts.UpdateRequired.Command != "" && m.Scripts.Update.Command == "" {
 		return fmt.Errorf("module '%s' has a should_update script defined, but no update script", m.Name)
-	} else if m.Scripts.Update != "" && m.Scripts.UpdateRequired == "" {
+	} else if m.Scripts.Update.Command != "" && m.Scripts.UpdateRequired.Command == "" {
 		return fmt.Errorf("module '%s' has an update script defined, but no should_update script", m.Name)
 	}
-	if m.Scripts.AfterFileChange != "" && len(m.Files) == 0 {
+	if m.Scripts.AfterFileChange.Command != "" && len(m.Files) == 0 {
 		return fmt.Errorf("module '%s' has an after_file_change script defined, but has no files configured", m.Name)
 	}
 

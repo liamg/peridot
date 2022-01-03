@@ -21,6 +21,8 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
+var testContainers []*testContainer
+
 func TestMain(m *testing.M) {
 
 	exitCode := func() int {
@@ -41,6 +43,10 @@ func TestMain(m *testing.M) {
 		return m.Run()
 	}()
 
+	for _, container := range testContainers {
+		container.Destroy()
+	}
+
 	os.Exit(exitCode)
 }
 
@@ -48,6 +54,14 @@ type testContainer struct {
 	id      string
 	hostDir string
 	client  *client.Client
+}
+
+func (t *testContainer) Destroy() {
+	_ = t.client.ContainerRemove(context.Background(), t.id, types.ContainerRemoveOptions{
+		RemoveVolumes: true,
+		Force:         true,
+	})
+	_ = os.RemoveAll(t.hostDir)
 }
 
 func (t *testContainer) AddPeridot() error {
@@ -224,6 +238,8 @@ func startContainer(image string) (*testContainer, error) {
 		hostDir: tmpDir,
 		client:  cli,
 	}
+
+	testContainers = append(testContainers, created)
 
 	if err := created.AddPeridot(); err != nil {
 		return nil, err
