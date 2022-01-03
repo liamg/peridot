@@ -18,6 +18,7 @@ import (
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 )
 
 func TestMain(m *testing.M) {
@@ -74,6 +75,17 @@ func (t *testContainer) ReadHomeFile(relativePath string) (string, error) {
 	return string(data), err
 }
 
+func (t *testContainer) WriteConfig(content string) error {
+	return t.WriteHomeFile(".config/peridot/config.yml", content)
+}
+
+func (t *testContainer) WriteHomeFile(relativePath, content string) error {
+	if err := os.MkdirAll(filepath.Join(t.hostDir, filepath.Dir(relativePath)), 0777); err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filepath.Join(t.hostDir, relativePath), []byte(content), 0777)
+}
+
 func (t *testContainer) Run(cmd string, args ...string) (string, int, error) {
 
 	fmt.Printf("Running command on %s: %s %s\n", t.id[:12], cmd, strings.Join(args, " "))
@@ -93,8 +105,12 @@ func (t *testContainer) Run(cmd string, args ...string) (string, int, error) {
 	if err != nil {
 		return "", 0, err
 	}
-	buffer := bytes.NewBufferString("")
-	_, _ = io.Copy(buffer, resp.Reader)
+
+	stdout := new(bytes.Buffer)
+	stderr := new(bytes.Buffer)
+	if _, err := stdcopy.StdCopy(stdout, stderr, resp.Reader); err != nil && err != io.EOF {
+		return "", 0, fmt.Errorf("copy failed: %s", err)
+	}
 
 	fmt.Println("Waiting for command...")
 	inspect, err := t.client.ContainerExecInspect(context.Background(), idResp.ID)
@@ -105,7 +121,10 @@ func (t *testContainer) Run(cmd string, args ...string) (string, int, error) {
 		return "", 0, fmt.Errorf("command is still running")
 	}
 
-	return buffer.String(), inspect.ExitCode, nil
+	if inspect.ExitCode > 0 {
+		return stderr.String(), inspect.ExitCode, nil
+	}
+	return stdout.String(), inspect.ExitCode, nil
 }
 
 func (t *testContainer) Stop() error {
@@ -162,7 +181,7 @@ func startContainer(image string) (*testContainer, error) {
 
 	for _, existing := range containers {
 		for _, name := range existing.Names {
-			if name[1:] == containerName {
+			if len(name) > 0 && name[1:] == containerName {
 				fmt.Printf("Removing old %s container: %s...\n", image, existing.ID)
 				if err := cli.ContainerRemove(context.Background(), existing.ID, types.ContainerRemoveOptions{
 					RemoveVolumes: true,
@@ -199,7 +218,7 @@ func startContainer(image string) (*testContainer, error) {
 	if err := cli.ContainerStart(context.Background(), cont.ID, types.ContainerStartOptions{}); err != nil {
 		return nil, err
 	}
-	time.Sleep(time.Second * 5)
+
 	created := &testContainer{
 		id:      cont.ID,
 		hostDir: tmpDir,

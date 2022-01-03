@@ -2,7 +2,6 @@ package test
 
 import (
 	"fmt"
-	"regexp"
 	"runtime"
 	"strings"
 	"testing"
@@ -11,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSystem(t *testing.T) {
+func TestSystemCommand(t *testing.T) {
 
 	c, err := startContainer("ubuntu")
 	if err != nil {
@@ -20,7 +19,7 @@ func TestSystem(t *testing.T) {
 	defer c.Stop()
 
 	// run system command
-	output, exit, err := c.Run("peridot", "system")
+	output, exit, err := c.Run("peridot", "system", "--no-ansi")
 	require.NoError(t, err)
 	require.Equal(t, 0, exit, output)
 
@@ -30,18 +29,13 @@ func TestSystem(t *testing.T) {
 		"Distribution":     false,
 	}
 
-	ansiRegex := regexp.MustCompile(`^.*\[0m`)
-
 	for _, line := range strings.Split(output, "\n") {
 		parts := strings.Split(line, ":")
 		if len(parts) != 2 {
 			continue
 		}
 		key := strings.TrimSpace(parts[0])
-		key = ansiRegex.ReplaceAllString(key, "")
 		value := strings.TrimSpace(parts[1])
-		value = strings.ReplaceAll(value, "\x1b[0m", "")
-		value = strings.ReplaceAll(value, "\x1b[1m", "")
 		switch key {
 		case "Architecture":
 			assert.Equal(t, runtime.GOARCH, value)
