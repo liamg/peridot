@@ -45,10 +45,10 @@ func (m *module) Files() []File {
 }
 
 func (m *module) RequiresUpdate() bool {
-	if m.conf.Scripts.UpdateRequired == "" {
+	if m.conf.Scripts.UpdateRequired.Command == "" {
 		return false
 	}
-	cmd := exec.Command("sh", "-c", m.conf.Scripts.UpdateRequired)
+	cmd := exec.Command("sh", "-c", m.conf.Scripts.UpdateRequired.Command)
 	if err := cmd.Run(); err != nil {
 		return false
 	}
@@ -56,10 +56,10 @@ func (m *module) RequiresUpdate() bool {
 }
 
 func (m *module) RequiresInstall() bool {
-	if m.conf.Scripts.InstallRequired == "" {
+	if m.conf.Scripts.InstallRequired.Command == "" {
 		return false
 	}
-	cmd := exec.Command("sh", "-c", m.conf.Scripts.InstallRequired)
+	cmd := exec.Command("sh", "-c", m.conf.Scripts.InstallRequired.Command)
 	if err := cmd.Run(); err != nil {
 		return false
 	}
@@ -67,18 +67,18 @@ func (m *module) RequiresInstall() bool {
 }
 
 func (m *module) Install() error {
-	return exec.Command("sh", "-c", m.conf.Scripts.Install).Run()
+	return exec.Command("sh", "-c", m.conf.Scripts.Install.Command).Run()
 }
 
 func (m *module) Update() error {
-	return exec.Command("sh", "-c", m.conf.Scripts.Update).Run()
+	return exec.Command("sh", "-c", m.conf.Scripts.Update.Command).Run()
 }
 
 func (m *module) AfterFileChange() error {
-	if m.conf.Scripts.AfterFileChange == "" {
+	if m.conf.Scripts.AfterFileChange.Command == "" {
 		return nil
 	}
-	return exec.Command("sh", "-c", m.conf.Scripts.AfterFileChange).Run()
+	return exec.Command("sh", "-c", m.conf.Scripts.AfterFileChange.Command).Run()
 }
 
 func (m *module) Validate() error {

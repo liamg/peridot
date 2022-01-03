@@ -81,8 +81,7 @@ func TestModule_Validate(t *testing.T) {
 			name: "scripts: has install_required but no install",
 			module: Module{
 				Scripts: Scripts{
-					InstallRequired: "check",
-					Install:         "",
+					InstallRequired: Script{Command: "check"},
 				},
 			},
 			wantErr: true,
@@ -91,8 +90,7 @@ func TestModule_Validate(t *testing.T) {
 			name: "scripts: has no install_required but has install",
 			module: Module{
 				Scripts: Scripts{
-					InstallRequired: "",
-					Install:         "check",
+					Install: Script{Command: "check"},
 				},
 			},
 			wantErr: true,
@@ -101,8 +99,7 @@ func TestModule_Validate(t *testing.T) {
 			name: "scripts: has update_required but no update",
 			module: Module{
 				Scripts: Scripts{
-					UpdateRequired: "check",
-					Update:         "",
+					UpdateRequired: Script{Command: "check"},
 				},
 			},
 			wantErr: true,
@@ -111,8 +108,7 @@ func TestModule_Validate(t *testing.T) {
 			name: "scripts: has no update_required but has update",
 			module: Module{
 				Scripts: Scripts{
-					UpdateRequired: "",
-					Update:         "check",
+					Update: Script{Command: "check"},
 				},
 			},
 			wantErr: true,
@@ -121,7 +117,7 @@ func TestModule_Validate(t *testing.T) {
 			name: "scripts: has after_file_change but no files",
 			module: Module{
 				Scripts: Scripts{
-					AfterFileChange: "check",
+					AfterFileChange: Script{Command: "check"},
 				},
 			},
 			wantErr: true,
