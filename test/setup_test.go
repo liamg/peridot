@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -99,22 +100,8 @@ func (t *testContainer) WriteHomeFile(relativePath, content string) error {
 	if err := os.MkdirAll(filepath.Join(t.hostDir, filepath.Dir(relativePath)), 0777); err != nil {
 		return err
 	}
-	_, exit, err := t.RunAsRoot("chown", "-R", defaultUser, "/home/"+defaultUser)
-	if err != nil {
-		return err
-	}
-	if exit > 0 {
-		return fmt.Errorf("exit code %d", exit)
-	}
 	if err := ioutil.WriteFile(filepath.Join(t.hostDir, relativePath), []byte(content), 0777); err != nil {
 		return err
-	}
-	_, exit, err = t.RunAsRoot("chown", "-R", defaultUser, "/home/"+defaultUser)
-	if err != nil {
-		return err
-	}
-	if exit > 0 {
-		return fmt.Errorf("exit code %d", exit)
 	}
 	return nil
 }
@@ -291,7 +278,12 @@ func startContainer(image string) (*testContainer, error) {
 		return nil, fmt.Errorf("failed to install peridot in container")
 	}
 
-	_, exit, err = created.RunAsRoot("useradd", defaultUser)
+	u, err := user.Current()
+	if err != nil {
+		return nil, err
+	}
+
+	_, exit, err = created.RunAsRoot("useradd", "-u", u.Uid, defaultUser)
 	if err != nil {
 		return nil, err
 	}
