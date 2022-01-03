@@ -13,11 +13,11 @@ type baseBuiltin struct {
 	inputs              []config.Variable
 	variables           variable.Collection
 	filesFunc           func(variable.Collection) []File
-	requiresInstallFunc func() bool
-	requiresUpdateFunc  func() bool
-	installFunc         func() error
-	updateFunc          func() error
-	afterFileChangeFunc func() error
+	requiresInstallFunc func(variable.Collection) bool
+	requiresUpdateFunc  func(variable.Collection) bool
+	installFunc         func(variable.Collection) error
+	updateFunc          func(variable.Collection) error
+	afterFileChangeFunc func(variable.Collection) error
 }
 
 func (b *baseBuiltin) Name() string {
@@ -56,35 +56,35 @@ func (b *baseBuiltin) RequiresUpdate() bool {
 	if b.requiresUpdateFunc == nil {
 		return false
 	}
-	return b.requiresUpdateFunc()
+	return b.requiresUpdateFunc(b.variables)
 }
 
 func (b *baseBuiltin) RequiresInstall() bool {
 	if b.requiresInstallFunc == nil {
 		return false
 	}
-	return b.requiresInstallFunc()
+	return b.requiresInstallFunc(b.variables)
 }
 
 func (b *baseBuiltin) Install() error {
 	if b.installFunc == nil {
 		return fmt.Errorf("install handler not implemented")
 	}
-	return b.installFunc()
+	return b.installFunc(b.variables)
 }
 
 func (b *baseBuiltin) Update() error {
 	if b.updateFunc == nil {
 		return fmt.Errorf("update handler not implemented")
 	}
-	return b.updateFunc()
+	return b.updateFunc(b.variables)
 }
 
 func (b *baseBuiltin) AfterFileChange() error {
 	if b.afterFileChangeFunc == nil {
 		return nil
 	}
-	return b.afterFileChangeFunc()
+	return b.afterFileChangeFunc(b.variables)
 }
 
 func (b *baseBuiltin) ApplyVariables(vars variable.Collection) {

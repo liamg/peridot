@@ -3,6 +3,7 @@ package module
 import (
 	"testing"
 
+	"github.com/liamg/peridot/internal/pkg/variable"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,23 +19,23 @@ func TestFactorySetsHandlers(t *testing.T) {
 
 	var requiresInstall, requiresUpdate, install, update, after bool
 
-	factory.WithRequiresInstallFunc(func() bool {
+	factory.WithRequiresInstallFunc(func(variable.Collection) bool {
 		requiresInstall = true
 		return false
 	})
-	factory.WithRequiresUpdateFunc(func() bool {
+	factory.WithRequiresUpdateFunc(func(variable.Collection) bool {
 		requiresUpdate = true
 		return false
 	})
-	factory.WithInstallFunc(func() error {
+	factory.WithInstallFunc(func(variable.Collection) error {
 		install = true
 		return nil
 	})
-	factory.WithUpdateFunc(func() error {
+	factory.WithUpdateFunc(func(variable.Collection) error {
 		update = true
 		return nil
 	})
-	factory.WithAfterFileChangeFunc(func() error {
+	factory.WithAfterFileChangeFunc(func(variable.Collection) error {
 		after = true
 		return nil
 	})

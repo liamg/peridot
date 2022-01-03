@@ -31,27 +31,27 @@ func (f *factory) WithFilesFunc(fnc func(vars variable.Collection) []File) *fact
 	return f
 }
 
-func (f *factory) WithRequiresUpdateFunc(fnc func() bool) *factory {
+func (f *factory) WithRequiresUpdateFunc(fnc func(variable.Collection) bool) *factory {
 	f.base.requiresUpdateFunc = fnc
 	return f
 }
 
-func (f *factory) WithRequiresInstallFunc(fnc func() bool) *factory {
+func (f *factory) WithRequiresInstallFunc(fnc func(variable.Collection) bool) *factory {
 	f.base.requiresInstallFunc = fnc
 	return f
 }
 
-func (f *factory) WithUpdateFunc(fnc func() error) *factory {
+func (f *factory) WithUpdateFunc(fnc func(variable.Collection) error) *factory {
 	f.base.updateFunc = fnc
 	return f
 }
 
-func (f *factory) WithInstallFunc(fnc func() error) *factory {
+func (f *factory) WithInstallFunc(fnc func(variable.Collection) error) *factory {
 	f.base.installFunc = fnc
 	return f
 }
 
-func (f *factory) WithAfterFileChangeFunc(fnc func() error) *factory {
+func (f *factory) WithAfterFileChangeFunc(fnc func(variable.Collection) error) *factory {
 	f.base.afterFileChangeFunc = fnc
 	return f
 }
