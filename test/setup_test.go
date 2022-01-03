@@ -23,6 +23,8 @@ import (
 
 var testContainers []*testContainer
 
+const defaultUser = "someone"
+
 func TestMain(m *testing.M) {
 
 	exitCode := func() int {
@@ -78,7 +80,7 @@ func (t *testContainer) AddFile(hostPath string) error {
 }
 
 func (t *testContainer) ReadHomeFile(relativePath string) (string, error) {
-	_, exit, err := t.Run("chmod", "-R", "777", ".")
+	_, exit, err := t.RunAsRoot("chmod", "-R", "777", ".")
 	if err != nil {
 		return "", err
 	}
@@ -100,12 +102,28 @@ func (t *testContainer) WriteHomeFile(relativePath, content string) error {
 	return ioutil.WriteFile(filepath.Join(t.hostDir, relativePath), []byte(content), 0777)
 }
 
-func (t *testContainer) Run(cmd string, args ...string) (string, int, error) {
+func (t *testContainer) RunAsUser(cmd string, args ...string) (string, int, error) {
+	return t.run(false, cmd, args...)
+}
+
+func (t *testContainer) RunAsRoot(cmd string, args ...string) (string, int, error) {
+	return t.run(true, cmd, args...)
+}
+
+func (t *testContainer) run(root bool, cmd string, args ...string) (string, int, error) {
+
+	user := defaultUser
+	home := fmt.Sprintf("/home/%s", user)
+
+	if root {
+		user = "root"
+		home = "/root"
+	}
 
 	fmt.Printf("Running command on %s: %s %s\n", t.id[:12], cmd, strings.Join(args, " "))
 	idResp, err := t.client.ContainerExecCreate(context.Background(), t.id, types.ExecConfig{
-		User:         "root",
-		WorkingDir:   "/root",
+		User:         user,
+		WorkingDir:   home,
 		Cmd:          append([]string{cmd}, args...),
 		AttachStderr: true,
 		AttachStdout: true,
@@ -121,8 +139,7 @@ func (t *testContainer) Run(cmd string, args ...string) (string, int, error) {
 	}
 
 	stdout := new(bytes.Buffer)
-	stderr := new(bytes.Buffer)
-	if _, err := stdcopy.StdCopy(stdout, stderr, resp.Reader); err != nil && err != io.EOF {
+	if _, err := stdcopy.StdCopy(stdout, stdout, resp.Reader); err != nil && err != io.EOF {
 		return "", 0, fmt.Errorf("copy failed: %s", err)
 	}
 
@@ -136,7 +153,7 @@ func (t *testContainer) Run(cmd string, args ...string) (string, int, error) {
 	}
 
 	if inspect.ExitCode > 0 {
-		return stderr.String(), inspect.ExitCode, nil
+		return stdout.String(), inspect.ExitCode, nil
 	}
 	return stdout.String(), inspect.ExitCode, nil
 }
@@ -220,7 +237,7 @@ func startContainer(image string) (*testContainer, error) {
 				{
 					Type:   mount.TypeBind,
 					Source: tmpDir,
-					Target: "/root",
+					Target: fmt.Sprintf("/home/%s", defaultUser),
 				},
 			},
 		}, nil, nil, containerName)
@@ -245,13 +262,27 @@ func startContainer(image string) (*testContainer, error) {
 		return nil, err
 	}
 
-	_, exit, err := created.Run("cp", "./peridot", "/usr/bin/")
+	_, exit, err := created.RunAsRoot("cp", fmt.Sprintf("/home/%s/peridot", defaultUser), "/usr/bin/")
 	if err != nil {
 		return nil, err
 	}
-
 	if exit > 0 {
 		return nil, fmt.Errorf("failed to install peridot in container")
+	}
+
+	_, exit, err = created.RunAsRoot("useradd", defaultUser)
+	if err != nil {
+		return nil, err
+	}
+	if exit > 0 {
+		return nil, fmt.Errorf("failed to add user to container")
+	}
+	_, exit, err = created.RunAsRoot("sh", "-c", fmt.Sprintf(`apt update && apt install -y sudo && usermod -a -G sudo %s`, defaultUser))
+	if err != nil {
+		return nil, err
+	}
+	if exit > 0 {
+		return nil, fmt.Errorf("failed to add user to sudoers")
 	}
 
 	return created, nil

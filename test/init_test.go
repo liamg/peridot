@@ -18,7 +18,7 @@ func TestInitCommand(t *testing.T) {
 	defer c.Stop()
 
 	// run init command
-	output, exit, err := c.Run("peridot", "init")
+	output, exit, err := c.RunAsUser("peridot", "init")
 	require.NoError(t, err)
 	require.Equal(t, 0, exit, output)
 
@@ -48,7 +48,7 @@ func TestInitCommandCannotOverwriteConfigByDefault(t *testing.T) {
 	require.NoError(t, c.WriteConfig(``))
 
 	// run init command
-	output, exit, err := c.Run("peridot", "init", "--no-ansi")
+	output, exit, err := c.RunAsUser("peridot", "init", "--no-ansi")
 	require.NoError(t, err)
 
 	// command should fail when config already exists
@@ -67,7 +67,7 @@ func TestInitCommandWithForcedOverwrite(t *testing.T) {
 	require.NoError(t, c.WriteConfig(``))
 
 	// run init command with force
-	output, exit, err := c.Run("peridot", "init", "--force", "--no-ansi")
+	output, exit, err := c.RunAsUser("peridot", "init", "--force", "--no-ansi")
 	require.NoError(t, err)
 	require.Equal(t, 0, exit, output)
 
@@ -95,7 +95,7 @@ func TestInitCommandWithForcedOverwriteWhenConfigIsInvalid(t *testing.T) {
 	require.NoError(t, c.WriteConfig(`this is invalid`))
 
 	// run init command with force
-	output, exit, err := c.Run("peridot", "init", "--force", "--no-ansi")
+	output, exit, err := c.RunAsUser("peridot", "init", "--force", "--no-ansi")
 	require.NoError(t, err)
 	require.Equal(t, 0, exit, output)
 
