@@ -23,6 +23,21 @@ func TestDiffCommandWithEmptyConfig(t *testing.T) {
 	assert.Contains(t, output, "no changes")
 }
 
+func TestDiffCommandWithInvalidConfig(t *testing.T) {
+
+	c, err := startContainer("ubuntu")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer c.Stop()
+
+	require.NoError(t, c.WriteConfig(`this is invalid`))
+
+	output, exit, err := c.Run("peridot", "diff", "--no-ansi")
+	require.NoError(t, err)
+	assert.Equal(t, 1, exit, output)
+}
+
 func TestDiffCommandWithSingleFileChanges(t *testing.T) {
 
 	c, err := startContainer("ubuntu")
@@ -46,7 +61,7 @@ files:
 	assert.Contains(t, output, "'/tmp/lol'")
 }
 
-func TestDiffCommandWehnOnlyFileAlreadyMatches(t *testing.T) {
+func TestDiffCommandWhenOnlyFileAlreadyMatches(t *testing.T) {
 
 	c, err := startContainer("ubuntu")
 	if err != nil {
