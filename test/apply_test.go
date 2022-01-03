@@ -53,7 +53,7 @@ func TestApplyCommandWithSingleFileChanges(t *testing.T) {
 	require.NoError(t, c.WriteConfig(`
 files:
   - target: "{{ .user_home_dir }}/hello.txt"
-    template: ./lol.tmpl
+    source: ./lol.tmpl
 `))
 
 	output, exit, err := c.RunAsUser("peridot", "apply", "--no-ansi")
@@ -80,7 +80,7 @@ func TestApplyCommandWhenOnlyFileAlreadyMatches(t *testing.T) {
 	require.NoError(t, c.WriteConfig(`
 files:
   - target: "{{ .user_home_dir }}/hello.txt"
-    template: ./lol.tmpl
+    source: ./lol.tmpl
 `))
 
 	output, exit, err := c.RunAsUser("peridot", "apply", "--no-ansi")

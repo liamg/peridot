@@ -51,7 +51,7 @@ func TestDiffCommandWithSingleFileChanges(t *testing.T) {
 	require.NoError(t, c.WriteConfig(`
 files:
   - target: /tmp/lol
-    template: ./lol.tmpl
+    source: ./lol.tmpl
 `))
 
 	output, exit, err := c.RunAsUser("peridot", "diff", "--no-ansi")
@@ -76,7 +76,7 @@ func TestDiffCommandWhenOnlyFileAlreadyMatches(t *testing.T) {
 	require.NoError(t, c.WriteConfig(`
 files:
   - target: "{{ .user_home_dir }}/hello.txt"
-    template: ./lol.tmpl
+    source: ./lol.tmpl
 `))
 
 	output, exit, err := c.RunAsUser("peridot", "diff", "--no-ansi")

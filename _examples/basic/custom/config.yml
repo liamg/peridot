@@ -7,4 +7,4 @@ variables:
     default: 37
 files:
   - target: {{ .user_home_dir }}{{ .sep }}example.txt
-    template: ./custom.tmpl
+    source: ./custom.tmpl
