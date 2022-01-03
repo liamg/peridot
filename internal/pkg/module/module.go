@@ -44,14 +44,17 @@ func (m *module) Files() []File {
 	return m.files
 }
 
+func runScript(s config.Script, path string) error {
+	return run.Run(s.Command, path, s.Sudo, s.Interactive)
+}
+
 func (m *module) RequiresUpdate() bool {
 	if m.conf.Scripts.UpdateRequired.Command == "" {
 		return false
 	}
-	return run.Run(
-		m.conf.Scripts.UpdateRequired.Command,
+	return runScript(
+		m.conf.Scripts.UpdateRequired,
 		m.Path(),
-		m.conf.Scripts.UpdateRequired.Sudo,
 	) == nil
 }
 
@@ -59,26 +62,23 @@ func (m *module) RequiresInstall() bool {
 	if m.conf.Scripts.InstallRequired.Command == "" {
 		return false
 	}
-	return run.Run(
-		m.conf.Scripts.InstallRequired.Command,
+	return runScript(
+		m.conf.Scripts.InstallRequired,
 		m.Path(),
-		m.conf.Scripts.InstallRequired.Sudo,
 	) == nil
 }
 
 func (m *module) Install() error {
-	return run.Run(
-		m.conf.Scripts.Install.Command,
+	return runScript(
+		m.conf.Scripts.Install,
 		m.Path(),
-		m.conf.Scripts.Install.Sudo,
 	)
 }
 
 func (m *module) Update() error {
-	return run.Run(
-		m.conf.Scripts.Update.Command,
+	return runScript(
+		m.conf.Scripts.Update,
 		m.Path(),
-		m.conf.Scripts.Update.Sudo,
 	)
 }
 
@@ -86,10 +86,9 @@ func (m *module) AfterFileChange() error {
 	if m.conf.Scripts.AfterFileChange.Command == "" {
 		return nil
 	}
-	return run.Run(
-		m.conf.Scripts.AfterFileChange.Command,
+	return runScript(
+		m.conf.Scripts.AfterFileChange,
 		m.Path(),
-		m.conf.Scripts.AfterFileChange.Sudo,
 	)
 }
 

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/liamg/peridot/internal/pkg/module"
 	"github.com/liamg/tml"
 	"github.com/spf13/cobra"
@@ -31,6 +33,7 @@ func init() {
 			for _, moduleDiff := range diffs {
 				tml.Printf("<yellow><bold>[Module %s] Applying changes...", moduleDiff.Module().Name())
 				if err := moduleDiff.Apply(); err != nil {
+					fmt.Println("")
 					fail(err)
 				}
 				tml.Printf("\x1b[2K\r<green>[Module %s] Changes applied.\n", moduleDiff.Module().Name())

@@ -129,7 +129,7 @@ func init() {
 				}
 			}
 
-			return run.Run("fc-cache -f", dir, false)
+			return run.Run("fc-cache -f", dir, false, false)
 		}).
 		Build()
 
