@@ -25,6 +25,10 @@ func init() {
 				Default: "vim",
 			},
 			{
+				Name:    "signingkey",
+				Default: "",
+			},
+			{
 				Name:    "aliases",
 				Default: []interface{}{},
 			},
@@ -49,8 +53,9 @@ var (
 [user]
 	name = {{ .username }}
 	email = {{ .email }}
+    {{ if .signingkey }}signingkey = {{ .signingkey }}{{ end }}
 [commit]
-	gpgsign = true
+	gpgsign = {{ if .signingkey }}true{{ else }}false{{ end }}
 [core]
 	excludesfile = ~/.gitignore
 {{ if .editor }}	editor = {{ .editor }}
