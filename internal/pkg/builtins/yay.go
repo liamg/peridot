@@ -31,7 +31,7 @@ func init() {
 				return fmt.Errorf("failed to sync package db: %s", err)
 			}
 			for _, pkg := range vars.Get("packages").AsList().All() {
-				if err := run.Run(fmt.Sprintf("yay -Qi %s || yay -S --noconfirm %s", pkg.AsString(), pkg.AsString()), "/", false, true); err != nil {
+				if err := run.Run(fmt.Sprintf("yay -Qi %s >/dev/null || yay -S --noconfirm %s", pkg.AsString(), pkg.AsString()), "/", false, true); err != nil {
 					return err
 				}
 			}
