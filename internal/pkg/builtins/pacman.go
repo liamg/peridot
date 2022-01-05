@@ -31,7 +31,7 @@ func init() {
 				return fmt.Errorf("failed to sync package db: %s", err)
 			}
 			for _, pkg := range vars.Get("packages").AsList().All() {
-				if err := run.Run(fmt.Sprintf("pacman -Qi %s || pacman -S %s", pkg.AsString(), pkg.AsString()), "/", true, true); err != nil {
+				if err := run.Run(fmt.Sprintf("pacman -Qi %s || pacman -S --noconfirm %s", pkg.AsString(), pkg.AsString()), "/", true, true); err != nil {
 					return err
 				}
 			}
