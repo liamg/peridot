@@ -7,11 +7,12 @@ import (
 )
 
 func init() {
-	var fullContentDiffs bool
+	var simpleDiffs bool
 	diffCmd := &cobra.Command{
 		Use:   "diff",
 		Short: "Compare the desired state as dictated by your peridot templates and config files with the actual local state.",
-		Run: func(cmd *cobra.Command, args []string) {
+		Args:  cobra.ExactArgs(0),
+		Run: func(_ *cobra.Command, _ []string) {
 			root, err := module.LoadRoot()
 			if err != nil {
 				fail(err)
@@ -30,7 +31,7 @@ func init() {
 			}
 
 			for _, diff := range diffs {
-				diff.Print(fullContentDiffs)
+				diff.Print(!simpleDiffs)
 			}
 
 			if changeCount == 1 {
@@ -40,6 +41,6 @@ func init() {
 			}
 		},
 	}
-	diffCmd.Flags().BoolVarP(&fullContentDiffs, "show-content", "s", fullContentDiffs, "Show full git-style file content diffs.")
+	diffCmd.Flags().BoolVarP(&simpleDiffs, "simple", "s", simpleDiffs, "Show simple diffs without file content changes.")
 	rootCmd.AddCommand(diffCmd)
 }

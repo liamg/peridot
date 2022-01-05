@@ -15,7 +15,8 @@ func init() {
 	initCmd := &cobra.Command{
 		Use:   "init",
 		Short: "Initialises a new peridot config for the local user environment.",
-		Run: func(cmd *cobra.Command, args []string) {
+		Args:  cobra.ExactArgs(0),
+		Run: func(_ *cobra.Command, _ []string) {
 			configPath, err := config.Path()
 			if err != nil {
 				fail(fmt.Sprintf("Cannot locate config path: %s", err))

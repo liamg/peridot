@@ -12,7 +12,8 @@ func init() {
 	applyCmd := &cobra.Command{
 		Use:   "apply",
 		Short: "Apply all required changes as dictated by the current configuration. You can preview changes first with the 'diff' command.",
-		Run: func(cmd *cobra.Command, args []string) {
+		Args:  cobra.ExactArgs(0),
+		Run: func(_ *cobra.Command, _ []string) {
 			root, err := module.LoadRoot()
 			if err != nil {
 				fail(err)

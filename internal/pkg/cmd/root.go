@@ -12,7 +12,7 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "peridot",
 	Short: "Manage dotfiles and user environments across machines, OSes, users and more.",
-	PersistentPreRun: func(_ *cobra.Command, args []string) {
+	PersistentPreRun: func(_ *cobra.Command, _ []string) {
 		if disableANSI {
 			tml.DisableFormatting()
 		}

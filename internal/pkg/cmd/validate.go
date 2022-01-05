@@ -13,7 +13,8 @@ func init() {
 	validateCmd := &cobra.Command{
 		Use:   "validate",
 		Short: "Validate the current configuration, taking no further action.",
-		Run: func(cmd *cobra.Command, args []string) {
+		Args:  cobra.ExactArgs(0),
+		Run: func(_ *cobra.Command, _ []string) {
 			root, err := module.LoadRoot()
 			if err != nil {
 				fail(err)
