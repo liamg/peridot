@@ -34,12 +34,12 @@ func (d *moduleDiff) Print(withContent bool) {
 		f.Print(withContent)
 	}
 	if d.before != d.after {
-		switch {
-		case d.after == StateInstalled:
+		switch d.after {
+		case StateInstalled:
 			tml.Printf("<green>[Module %s] Requires install.</green>\n", d.module.Name())
-		case d.after == StateUninstalled:
+		case StateUninstalled:
 			tml.Printf("<red>[Module %s] Requires uninstall.</red>\n", d.module.Name())
-		case d.after == StateUpdated:
+		case StateUpdated:
 			tml.Printf("<yellow>[Module %s] Requires updated.</yellow>\n", d.module.Name())
 		}
 	}

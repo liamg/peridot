@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/liamg/peridot/internal/pkg/config"
-	"github.com/liamg/peridot/internal/pkg/run"
 	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
@@ -44,8 +43,9 @@ func (m *module) Files() []File {
 	return m.files
 }
 
-func runScript(s config.Script, path string) error {
-	return run.Run(s.Command, path, s.Sudo, s.Interactive)
+func runScript(m Module, s config.Script) error {
+	r := NewRunner(m)
+	return r.Run(s.Command, s.Sudo)
 }
 
 func (m *module) RequiresUpdate() bool {
@@ -53,8 +53,8 @@ func (m *module) RequiresUpdate() bool {
 		return false
 	}
 	return runScript(
+		m,
 		m.conf.Scripts.UpdateRequired,
-		m.Path(),
 	) == nil
 }
 
@@ -63,22 +63,22 @@ func (m *module) RequiresInstall() bool {
 		return false
 	}
 	return runScript(
+		m,
 		m.conf.Scripts.InstallRequired,
-		m.Path(),
 	) == nil
 }
 
 func (m *module) Install() error {
 	return runScript(
+		m,
 		m.conf.Scripts.Install,
-		m.Path(),
 	)
 }
 
 func (m *module) Update() error {
 	return runScript(
+		m,
 		m.conf.Scripts.Update,
-		m.Path(),
 	)
 }
 
@@ -87,8 +87,8 @@ func (m *module) AfterFileChange() error {
 		return nil
 	}
 	return runScript(
+		m,
 		m.conf.Scripts.AfterFileChange,
-		m.Path(),
 	)
 }
 
