@@ -12,7 +12,6 @@ import (
 
 	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/module"
-	"github.com/liamg/peridot/internal/pkg/run"
 	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
@@ -46,14 +45,14 @@ func init() {
 				Default: "",
 			},
 		}).
-		WithRequiresInstallFunc(func(vars variable.Collection) bool {
+		WithRequiresInstallFunc(func(_ *module.Runner, vars variable.Collection) (bool, error) {
 
 			dir, err := getFontsDir(vars)
 			if err != nil {
-				return false
+				return false, err
 			}
 			if err := os.MkdirAll(dir, 0700); err != nil {
-				return false
+				return false, err
 			}
 
 			for _, file := range vars.Get("files").AsList().All() {
@@ -66,13 +65,13 @@ func init() {
 
 				expectedPath := filepath.Join(dir, filename)
 				if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
-					return true
+					return true, nil
 				}
 			}
 
-			return false
+			return false, nil
 		}).
-		WithInstallFunc(func(vars variable.Collection) error {
+		WithInstallFunc(func(r *module.Runner, vars variable.Collection) error {
 
 			dir, err := getFontsDir(vars)
 			if err != nil {
@@ -129,7 +128,7 @@ func init() {
 				}
 			}
 
-			return run.Run("fc-cache -f", dir, false, false)
+			return r.Run("fc-cache -f", false)
 		}).
 		Build()
 

@@ -5,6 +5,7 @@ import (
 	"os"
 
 	_ "github.com/liamg/peridot/internal/pkg/builtins"
+	"github.com/liamg/peridot/internal/pkg/log"
 	"github.com/liamg/tml"
 	"github.com/spf13/cobra"
 )
@@ -16,13 +17,18 @@ var rootCmd = &cobra.Command{
 		if disableANSI {
 			tml.DisableFormatting()
 		}
+		if debugMode {
+			log.Enable()
+		}
 	},
 }
 
 var disableANSI bool
+var debugMode bool
 
 func init() {
 	rootCmd.PersistentFlags().BoolVar(&disableANSI, "no-ansi", disableANSI, "Disable ANSI colour/formatting codes in output.")
+	rootCmd.PersistentFlags().BoolVarP(&debugMode, "debug", "d", debugMode, "Enable debug output.")
 }
 
 func Execute() {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/liamg/peridot/internal/pkg/config"
 	"github.com/liamg/peridot/internal/pkg/module"
-	"github.com/liamg/peridot/internal/pkg/run"
 	"github.com/liamg/peridot/internal/pkg/variable"
 )
 
@@ -18,21 +17,23 @@ func init() {
 				Required: true,
 			},
 		}).
-		WithRequiresInstallFunc(func(vars variable.Collection) bool {
+		WithRequiresInstallFunc(func(r *module.Runner, vars variable.Collection) (bool, error) {
 			for _, pkg := range vars.Get("packages").AsList().All() {
-				if err := run.Run(fmt.Sprintf("yay -Qi %s", pkg.AsString()), "/", false, false); err != nil {
-					return true
+				if err := r.Run(fmt.Sprintf("yay -Qi %s > /dev/null", pkg.AsString()), false); err != nil {
+					return true, nil
 				}
 			}
-			return false
+			return false, nil
 		}).
-		WithInstallFunc(func(vars variable.Collection) error {
-			if err := run.Run("yay -Syy", "/", false, true); err != nil {
+		WithInstallFunc(func(r *module.Runner, vars variable.Collection) error {
+			if err := r.Run("yay -Syy", false); err != nil {
 				return fmt.Errorf("failed to sync package db: %s", err)
 			}
 			for _, pkg := range vars.Get("packages").AsList().All() {
-				if err := run.Run(fmt.Sprintf("yay -Qi %s >/dev/null || yay -S --noconfirm %s", pkg.AsString(), pkg.AsString()), "/", false, true); err != nil {
-					return err
+				if err := r.Run(fmt.Sprintf("yay -Qi %s >/dev/null", pkg.AsString()), false); err != nil {
+					if err := r.Run(fmt.Sprintf("yay -S --noconfirm %s", pkg.AsString()), true); err != nil {
+						return err
+					}
 				}
 			}
 			return nil

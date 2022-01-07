@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+
+	"github.com/liamg/peridot/internal/pkg/log"
 )
 
 type State uint8
@@ -38,7 +40,11 @@ func Diff(m Module) ([]ModuleDiff, error) {
 	var fileDiffs []FileDiff
 	var moduleDiffs []ModuleDiff
 
+	logger := log.NewLogger(m.Name())
+	logger.Log("Checking module for required changes...")
+
 	for _, file := range m.Files() {
+		logger.Log("Comparing %s...", file.Target())
 		if err := func() error {
 			diff := fileDiff{
 				module:    m,
@@ -62,6 +68,7 @@ func Diff(m Module) ([]ModuleDiff, error) {
 			}
 			diff.after = after
 			if diff.before != diff.after {
+				logger.Log("Changes are required for %s!", diff.Path())
 				fileDiffs = append(fileDiffs, &diff)
 			}
 			return nil
@@ -72,6 +79,7 @@ func Diff(m Module) ([]ModuleDiff, error) {
 
 	// run scripts.update_required and scripts.install_required to see if update is needed
 	if m.RequiresInstall() {
+		logger.Log("Installation is required!")
 		moduleDiffs = append(moduleDiffs, &moduleDiff{
 			module:    m,
 			before:    StateUninstalled,
@@ -79,6 +87,7 @@ func Diff(m Module) ([]ModuleDiff, error) {
 			fileDiffs: fileDiffs,
 		})
 	} else if m.RequiresUpdate() {
+		logger.Log("Update is required!")
 		moduleDiffs = append(moduleDiffs, &moduleDiff{
 			module:    m,
 			before:    StateInstalled,
@@ -86,6 +95,7 @@ func Diff(m Module) ([]ModuleDiff, error) {
 			fileDiffs: fileDiffs,
 		})
 	} else if len(fileDiffs) > 0 {
+		logger.Log("Module has file(s) needing updates!")
 		moduleDiffs = append(moduleDiffs, &moduleDiff{
 			module:    m,
 			before:    StateInstalled,
