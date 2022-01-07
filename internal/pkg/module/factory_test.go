@@ -19,23 +19,23 @@ func TestFactorySetsHandlers(t *testing.T) {
 
 	var requiresInstall, requiresUpdate, install, update, after bool
 
-	factory.WithRequiresInstallFunc(func(variable.Collection) bool {
+	factory.WithRequiresInstallFunc(func(*Runner, variable.Collection) (bool, error) {
 		requiresInstall = true
-		return false
+		return false, nil
 	})
-	factory.WithRequiresUpdateFunc(func(variable.Collection) bool {
+	factory.WithRequiresUpdateFunc(func(*Runner, variable.Collection) (bool, error) {
 		requiresUpdate = true
-		return false
+		return false, nil
 	})
-	factory.WithInstallFunc(func(variable.Collection) error {
+	factory.WithInstallFunc(func(*Runner, variable.Collection) error {
 		install = true
 		return nil
 	})
-	factory.WithUpdateFunc(func(variable.Collection) error {
+	factory.WithUpdateFunc(func(*Runner, variable.Collection) error {
 		update = true
 		return nil
 	})
-	factory.WithAfterFileChangeFunc(func(variable.Collection) error {
+	factory.WithAfterFileChangeFunc(func(*Runner, variable.Collection) error {
 		after = true
 		return nil
 	})
