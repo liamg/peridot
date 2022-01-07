@@ -2,51 +2,35 @@ package log
 
 import (
 	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
 	"sync"
 )
 
 type prefixedWriter struct {
 	sync.Mutex
-	prefix    string
-	recipient io.Writer
-	buffer    string
+	logger *Logger
+	buffer string
 }
 
-func NewDebugStreamer(prefix string) *prefixedWriter {
-	if !enabled {
-		return NewPrefixedWriter(prefix, ioutil.Discard)
-	}
-	return NewPrefixedWriter(prefix, os.Stdout)
-}
-
-func NewPrefixedWriter(prefix string, recipient io.Writer) *prefixedWriter {
+func NewPrefixedWriter(prefix string, operation string) *prefixedWriter {
 	return &prefixedWriter{
-		prefix:    prefix,
-		recipient: recipient,
+		logger: NewLogger(fmt.Sprintf("%s:%s", prefix, operation)),
 	}
 }
 
-func (p *prefixedWriter) Flush() error {
+func (p *prefixedWriter) Flush() {
 	if p.buffer == "" {
-		return nil
+		return
 	}
-	_, err := fmt.Fprintf(p.recipient, "%s %s\n", p.prefix, p.buffer)
+	p.logger.Log("%s", p.buffer)
 	p.buffer = ""
-	return err
 }
 
 func (p *prefixedWriter) Write(d []byte) (n int, err error) {
 	p.Lock()
 	defer p.Unlock()
-	var written int
 	for _, r := range string(d) {
 		if r == '\n' {
-			if err := p.Flush(); err != nil {
-				return written, err
-			}
+			p.Flush()
 			continue
 		}
 		p.buffer += string(r)

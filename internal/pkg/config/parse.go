@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/liamg/peridot/internal/pkg/log"
 	"github.com/liamg/peridot/internal/pkg/template"
 	"github.com/liamg/peridot/internal/pkg/variable"
 	"gopkg.in/yaml.v3"
@@ -40,6 +41,8 @@ func Parse(path string, variables variable.Collection) (*Module, error) {
 	if err := yaml.Unmarshal(buffer.Bytes(), &m); err != nil {
 		return nil, fmt.Errorf("error in %s: %w", path, err)
 	}
+	logger := log.NewLogger("parser")
+	logger.Log("Validating config at %s...", path)
 	if err := m.Validate(); err != nil {
 		return nil, err
 	}

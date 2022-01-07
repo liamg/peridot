@@ -10,12 +10,14 @@ import (
 )
 
 type Runner struct {
-	module Module
+	module    Module
+	operation string
 }
 
-func NewRunner(module Module) *Runner {
+func NewRunner(module Module, operation string) *Runner {
 	return &Runner{
-		module: module,
+		module:    module,
+		operation: operation,
 	}
 }
 
@@ -33,9 +35,7 @@ func (r *Runner) Run(command string, sudo bool) error {
 		cmd.Stderr = os.Stderr
 	} else {
 		cmd = exec.Command("sh", "-c", command)
-		output := log.NewDebugStreamer(
-			tml.Sprintf("[<yellow><bold>%s</bold></yellow>]", r.module.Name()),
-		)
+		output := log.NewPrefixedWriter(r.module.Name(), r.operation)
 		defer output.Flush()
 		output.Write([]byte(fmt.Sprintf("Running command: %s\n", command)))
 		cmd.Stdout = output

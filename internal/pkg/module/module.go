@@ -43,8 +43,8 @@ func (m *module) Files() []File {
 	return m.files
 }
 
-func runScript(m Module, s config.Script) error {
-	r := NewRunner(m)
+func runScript(m Module, s config.Script, operation string) error {
+	r := NewRunner(m, operation)
 	return r.Run(s.Command, s.Sudo)
 }
 
@@ -55,6 +55,7 @@ func (m *module) RequiresUpdate() bool {
 	return runScript(
 		m,
 		m.conf.Scripts.UpdateRequired,
+		"should_update",
 	) == nil
 }
 
@@ -65,6 +66,7 @@ func (m *module) RequiresInstall() bool {
 	return runScript(
 		m,
 		m.conf.Scripts.InstallRequired,
+		"should_install",
 	) == nil
 }
 
@@ -72,6 +74,7 @@ func (m *module) Install() error {
 	return runScript(
 		m,
 		m.conf.Scripts.Install,
+		"install",
 	)
 }
 
@@ -79,6 +82,7 @@ func (m *module) Update() error {
 	return runScript(
 		m,
 		m.conf.Scripts.Update,
+		"update",
 	)
 }
 
@@ -89,6 +93,7 @@ func (m *module) AfterFileChange() error {
 	return runScript(
 		m,
 		m.conf.Scripts.AfterFileChange,
+		"after_file_change",
 	)
 }
 

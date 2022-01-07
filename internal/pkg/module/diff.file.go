@@ -9,6 +9,7 @@ import (
 	"github.com/hexops/gotextdiff"
 	"github.com/hexops/gotextdiff/myers"
 	"github.com/hexops/gotextdiff/span"
+	"github.com/liamg/peridot/internal/pkg/log"
 	"github.com/liamg/tml"
 )
 
@@ -70,14 +71,19 @@ func (d *fileDiff) Print(withContent bool) {
 }
 
 func (d *fileDiff) Apply() error {
+
+	logger := log.NewLogger(d.module.Name())
+
 	switch d.operation {
 	case OpDelete:
+		logger.Log("Removing file %s...", d.path)
 		return os.Remove(d.path)
 	default:
 		dir := filepath.Dir(d.path)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
+		logger.Log("Writing file %s...", d.path)
 		f, err := os.Create(d.path)
 		if err != nil {
 			return err
