@@ -25,9 +25,8 @@ type Scripts struct {
 }
 
 type Script struct {
-	Command     string `yaml:"command"`
-	Sudo        bool   `yaml:"sudo"`
-	Interactive bool   `yaml:"interactive"`
+	Command string `yaml:"command"`
+	Sudo    bool   `yaml:"sudo"`
 }
 
 type InnerModule struct {

@@ -12,6 +12,7 @@ func init() {
 	applyCmd := &cobra.Command{
 		Use:   "apply",
 		Short: "Apply all required changes as dictated by the current configuration. You can preview changes first with the 'diff' command.",
+		Args:  cobra.ExactArgs(0),
 		Run: func(_ *cobra.Command, _ []string) {
 			root, err := module.LoadRoot()
 			if err != nil {
@@ -24,9 +25,8 @@ func init() {
 			}
 
 			changeCount := len(diffs)
-
 			if changeCount == 0 {
-				tml.Println("<yellow><bold>Nothing to do, no changes necessary.</bold></yellow>")
+				tml.Println("<green><bold>Nothing to do, no changes necessary.</bold></green>")
 				return
 			}
 

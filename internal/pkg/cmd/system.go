@@ -10,7 +10,8 @@ func init() {
 	systemCmd := &cobra.Command{
 		Use:   "system",
 		Short: "",
-		Run: func(cmd *cobra.Command, args []string) {
+		Args:  cobra.ExactArgs(0),
+		Run: func(_ *cobra.Command, _ []string) {
 			info := system.Info()
 			tml.Printf("Architecture:     <bold>%s</bold>\n", info.Architecture)
 			tml.Printf("Operating System: <bold>%s</bold>\n", info.OperatingSystem)

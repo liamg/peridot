@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Commands
-nav_order: 3
+nav_order: 4
 ---
 
 # Commands
@@ -14,17 +14,19 @@ Use `peridot --help` for more information on all available commands and options.
 
 Initialises a new peridot config for the local user environment.
 
-## `use`
+## `validate`
 
-Uses a remote config as a basis for managing the local user environment.
-
-This takes a GitHub `owner/repo` repository alias of a repository which you have read/write access for. It's recommended to create a dedicated GitHub repository for your peridot config files.
+Validates the peridot config files, printing any errors to the terminal and exiting with a non-zero status if any are found.
 
 ## `diff`
 
-Compares the desired state as dictated by your peridot templates and config files with the actual local state.
+Compares the desired state as dictated by your peridot templates and config files against the actual local state.
 
 ## `apply`
 
 Applies changes to the local state to conform to your peridot templates and config files. You can preview these changes before making them using the `diff` command.
+
+## `system`
+
+Print local system information to the terminal, to be used with the [filters](modules/filters) feature.
 
