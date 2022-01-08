@@ -45,7 +45,11 @@ Let's say we want our config to switch on a special feature for all of our Linux
 {{ end }}
 ```
 
-At this point, our configuration is complete. Peridot can tell us what changes it will make before it changes anything, to ensure our config is correct. We can do this with the `diff` command, like so:
+You can explore the functionality available in templates by reading up on the [Go text/template system](https://pkg.go.dev/text/template).
+
+At this point, our configuration is complete. 
+
+Peridot can tell us what changes it will make before it changes anything, to ensure our config is correct. We can do this with the `diff` command, like so:
 
 ```bash
 peridot diff
@@ -79,4 +83,24 @@ And our `my-app` config file at `~/my-app.conf` will now contain (on Linux):
 enable_special_feature = true
 ```
 
+The `--debug` flag is available for debugging this process. It provides stdout/stderr for all scripts run by peridot, and an internal log of peridot's actions too.
+
 ## Utilising your first built-in module
+
+Several modules are included as part of the peridot binary, meaning you can get started using them without having to write any templates.
+
+One of such modules is the [apt built-in](modules/builtins/#builtinpacman). It enables you to specify one or more pacman packages for installation.
+
+For example:
+
+```yaml
+modules:
+    - builtin:pacman
+      variables:
+        packages:
+            - neovim
+            - firefox
+```
+
+When this configuration is applied, the `neovim` and `firefox` packages will be installed using pacman. That is, if pacman is available on the target system. The [filters feature](modules/filters) exists to check this and use the right package manager for the specific system where the configuration is being applied.
+

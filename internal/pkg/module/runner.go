@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/liamg/peridot/internal/pkg/log"
 	"github.com/liamg/tml"
@@ -12,7 +13,12 @@ import (
 type Runner struct {
 	module    Module
 	operation string
+	usedSudo  *time.Time
 }
+
+// default is 15, so assume 5 is safe for most users
+// can make this configurable if it's ever a problem
+const sudoTimeout = time.Minute * 5
 
 func NewRunner(module Module, operation string) *Runner {
 	return &Runner{
@@ -23,8 +29,12 @@ func NewRunner(module Module, operation string) *Runner {
 
 func (r *Runner) Run(command string, sudo bool) error {
 
-	if sudo {
+	if sudo && (r.usedSudo == nil || time.Since(*r.usedSudo) > sudoTimeout) {
 		tml.Printf("\n<bold><blue>This change requires root access. Please enter your password if prompted.</blue></bold>\n")
+		defer func() {
+			t := time.Now()
+			r.usedSudo = &t
+		}()
 	}
 
 	var cmd *exec.Cmd

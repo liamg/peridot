@@ -28,5 +28,5 @@ Applies changes to the local state to conform to your peridot templates and conf
 
 ## `system`
 
-Print local system information to the terminal, to be used with the [filters](modules/#filters) feature.
+Print local system information to the terminal, to be used with the [filters](modules/filters) feature.
 

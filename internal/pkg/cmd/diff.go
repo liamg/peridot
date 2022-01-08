@@ -26,7 +26,7 @@ func init() {
 			changeCount := len(diffs)
 
 			if changeCount == 0 {
-				tml.Println("<yellow><bold>Nothing to do, no changes necessary.</bold></yellow>")
+				tml.Println("<green><bold>Nothing to do, no changes necessary.</bold></green>")
 				return
 			}
 
