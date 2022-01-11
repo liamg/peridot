@@ -1,6 +1,6 @@
 # peridot
 
-Local developer machine management for Linux/OSX. Think Terraform for your dotfiles.
+Developer machine management for Linux/OSX. Think Terraform for your dotfiles.
 
 ![demo](demo.gif)
 
