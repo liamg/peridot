@@ -9,7 +9,7 @@ nav_order: 1
 
 Peridot is a CLI utility that provides developer machine management for Linux/OSX. Think Terraform for your dotfiles.
 
-![demo](https://raw.githubusercontent.com/liamg/peridot/main/demo.gif)
+![demo](demo.gif)
 
 ✅ Manage dotfiles in one central repository
 
