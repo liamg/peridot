@@ -22,4 +22,4 @@ If you struggle with maintaining your dotfiles, sharing them across multiple mac
 
 ## Documentation
 
-Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/guide) to get started.
+Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/guide) to get started. You can see a [real-world example of peridot managing dotfiles here](https://github.com/liamg/peridot-config).
