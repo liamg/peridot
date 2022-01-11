@@ -2,6 +2,8 @@
 
 Local developer machine management for Linux/OSX. Think Terraform for your dotfiles.
 
+![demo](demo.gif)
+
 :heavy_check_mark: Manage dotfiles in one central repository
 
 :heavy_check_mark: Template config files with logic to tweak config per OS/distro etc.
