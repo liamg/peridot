@@ -7,7 +7,7 @@ title: Home
 nav_order: 1
 ---
 
-Peridot is a CLI utility that provides user environment management for Linux/OSX. Think Terraform for your dotfiles and local setup that can be applied across your machines, regardless of differences in distro, window manager etc.
+Peridot is a CLI utility that provides user environment management for Linux/OSX. Think Terraform for your dotfiles.
 
 ![demo](https://github.com/liamg/peridot/tree/master/demo.gif)
 
