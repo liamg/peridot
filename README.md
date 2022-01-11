@@ -2,6 +2,8 @@
 
 Local developer machine management for Linux/OSX. Think Terraform for your dotfiles.
 
+![demo](demo.gif)
+
 :heavy_check_mark: Manage dotfiles in one central repository
 
 :heavy_check_mark: Template config files with logic to tweak config per OS/distro etc.
@@ -20,4 +22,4 @@ If you struggle with maintaining your dotfiles, sharing them across multiple mac
 
 ## Documentation
 
-Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/guide) to get started.
+Please see the [official documentation](https://www.liam-galvin.co.uk/peridot/guide) to get started. You can see a [real-world example of peridot managing dotfiles here](https://github.com/liamg/peridot-config).
