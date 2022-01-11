@@ -18,6 +18,8 @@ This will create a config file in `~/.config/peridot/config.yml` (or `$XDG_CONFI
 
 By itself, the config file will not do anything, it is empty by default.
 
+You can see a [full breakdown of the config file format](schema), but for now we'll delve into some conrete examples...
+
 ## Managing your first dotfile
 
 In this example we'll configure a fictional app `my-app`, which we'll imagine uses a config file found in `~/.my-app.conf`.
@@ -97,12 +99,28 @@ For example:
 
 ```yaml
 modules:
-    - builtin:pacman
-      variables:
-        packages:
-            - neovim
-            - firefox
+  - builtin:pacman
+    variables:
+      packages:
+        - neovim
+        - firefox
 ```
 
-When this configuration is applied, the `neovim` and `firefox` packages will be installed using pacman. That is, if pacman is available on the target system. The [filters feature](modules/filters) exists to check this and use the right package manager for the specific system where the configuration is being applied.
+When this configuration is applied, the `neovim` and `firefox` packages will be installed using pacman. 
+
+Of course, `pacman` won;t be available on many systems, so we can add a [filter](modules/filters) to ensure this module will only be applied on Arch Linux systems:
+
+```yaml
+modules:
+  - builtin:pacman
+    filters:
+      os: linux
+      distro: arch
+    variables:
+      packages:
+        - neovim
+        - firefox
+```
+
+
 

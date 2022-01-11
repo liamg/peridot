@@ -2,7 +2,7 @@
 
 Developer machine management for Linux/OSX. Think Terraform for your dotfiles.
 
-![demo](demo.gif)
+![demo](docs/demo.gif)
 
 :heavy_check_mark: Manage dotfiles in one central repository
 

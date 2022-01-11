@@ -52,5 +52,6 @@ func ParseRoot() (*Module, *Override, error) {
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return mod, &override, nil
 }
