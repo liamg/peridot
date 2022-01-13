@@ -99,7 +99,8 @@ For example:
 
 ```yaml
 modules:
-  - builtin:pacman
+  - name: install packages
+    source: builtin:pacman
     variables:
       packages:
         - neovim
@@ -112,7 +113,8 @@ Of course, `pacman` won;t be available on many systems, so we can add a [filter]
 
 ```yaml
 modules:
-  - builtin:pacman
+  - name: install packages
+    source: builtin:pacman
     filters:
       os: linux
       distro: arch
