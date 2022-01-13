@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"gopkg.in/yaml.v3"
@@ -30,6 +32,15 @@ func Init() (string, error) {
 	}
 	if err := yaml.NewEncoder(f).Encode(DefaultConfig); err != nil {
 		return "", err
+	}
+	gitPath, err := exec.LookPath("git")
+	if err != nil {
+		return "", fmt.Errorf("git binary not found in path: %w", err)
+	}
+	cmd := exec.Command(gitPath, "init")
+	cmd.Dir = dir
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("git repository init failed: %w", err)
 	}
 	return path, nil
 }

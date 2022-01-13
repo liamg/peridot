@@ -17,6 +17,9 @@ func TestInitCommand(t *testing.T) {
 	}
 	defer func() { _ = c.Stop() }()
 
+	_, _, err = c.RunAsRoot("sh", "-c", "apt update && apt install -y git")
+	require.NoError(t, err)
+
 	// run init command
 	output, exit, err := c.RunAsUser("peridot", "init")
 	require.NoError(t, err)
@@ -35,6 +38,9 @@ func TestInitCommand(t *testing.T) {
 	assert.Len(t, out.Files, 0)
 	assert.Len(t, out.Modules, 0)
 	assert.Len(t, out.Variables, 0)
+
+	_, err = c.ReadHomeFile(".config/peridot/.git/config")
+	require.NoError(t, err)
 }
 
 func TestInitCommandCannotOverwriteConfigByDefault(t *testing.T) {
@@ -47,6 +53,9 @@ func TestInitCommandCannotOverwriteConfigByDefault(t *testing.T) {
 
 	require.NoError(t, c.WriteConfig(``))
 
+	_, _, err = c.RunAsRoot("sh", "-c", "apt update && apt install -y git")
+	require.NoError(t, err)
+
 	// run init command
 	output, exit, err := c.RunAsUser("peridot", "init", "--no-ansi")
 	require.NoError(t, err)
@@ -55,6 +64,7 @@ func TestInitCommandCannotOverwriteConfigByDefault(t *testing.T) {
 	require.Equal(t, 1, exit, output)
 
 }
+
 func TestInitCommandWithForcedOverwrite(t *testing.T) {
 
 	c, err := startContainer("ubuntu")
@@ -65,6 +75,9 @@ func TestInitCommandWithForcedOverwrite(t *testing.T) {
 
 	// place a config
 	require.NoError(t, c.WriteConfig(``))
+
+	_, _, err = c.RunAsRoot("sh", "-c", "apt update && apt install -y git")
+	require.NoError(t, err)
 
 	// run init command with force
 	output, exit, err := c.RunAsUser("peridot", "init", "--force", "--no-ansi")
@@ -93,6 +106,9 @@ func TestInitCommandWithForcedOverwriteWhenConfigIsInvalid(t *testing.T) {
 
 	// place a bad config
 	require.NoError(t, c.WriteConfig(`this is invalid`))
+
+	_, _, err = c.RunAsRoot("sh", "-c", "apt update && apt install -y git")
+	require.NoError(t, err)
 
 	// run init command with force
 	output, exit, err := c.RunAsUser("peridot", "init", "--force", "--no-ansi")
