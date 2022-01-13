@@ -36,7 +36,7 @@ func init() {
 			if err != nil {
 				fail(err)
 			}
-			tml.Printf("<green><bold>New configuration file initialised at %s</bold></green>\n", path)
+			tml.Printf("<green><bold>New configuration file and git repository initialised at %s</bold></green>\n", path)
 		},
 	}
 	initCmd.Flags().BoolVarP(&force, "force", "f", force, "Force peridot to overwrite an existing config and reinitialise a fresh one.")
