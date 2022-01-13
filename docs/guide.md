@@ -40,7 +40,7 @@ The `source` property refers to the file to use as a template for the target fil
 
 Let's say we want our config to switch on a special feature for all of our Linux machines - the template could look something like this:
 
-```toml
+```
 {% raw %}
 [config]
 {{ if eq .sys_os "linux" }}enable_special_feature = true
