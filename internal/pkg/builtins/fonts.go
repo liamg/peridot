@@ -32,6 +32,93 @@ func getFontsDir(vars variable.Collection) (string, error) {
 	return dir, nil
 }
 
+func fontsRequiresInstall(_ *module.Runner, vars variable.Collection) (bool, error) {
+
+	dir, err := getFontsDir(vars)
+	if err != nil {
+		return false, err
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return false, err
+	}
+
+	for _, file := range vars.Get("files").AsList().All() {
+		var filename string
+		if strings.HasPrefix(file.AsString(), "./") {
+			filename = filepath.Base(file.AsString())
+		} else if parsed, err := url.Parse(file.AsString()); err == nil && parsed.Host != "" {
+			filename = path.Base(parsed.Path)
+		}
+
+		expectedPath := filepath.Join(dir, filename)
+		if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func fontsInstall(r *module.Runner, vars variable.Collection) error {
+
+	dir, err := getFontsDir(vars)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return err
+	}
+
+	for _, file := range vars.Get("files").AsList().All() {
+		var filename string
+		if strings.HasPrefix(file.AsString(), "./") {
+			filename = filepath.Base(file.AsString())
+			targetPath := filepath.Join(dir, filename)
+			if _, err := os.Stat(targetPath); !os.IsNotExist(err) {
+				continue
+			}
+
+			fontData, err := ioutil.ReadFile(file.AsString())
+			if err != nil {
+				return fmt.Errorf("failed to install font from %s: %w", file.AsString(), err)
+			}
+			if err := ioutil.WriteFile(targetPath, fontData, 0600); err != nil {
+				return err
+			}
+		} else if parsed, err := url.Parse(file.AsString()); err == nil && parsed.Host != "" {
+			filename = path.Base(parsed.Path)
+			targetPath := filepath.Join(dir, filename)
+			if _, err := os.Stat(targetPath); !os.IsNotExist(err) {
+				continue
+			}
+			if err := func() error {
+				resp, err := http.Get(parsed.String())
+				if err != nil {
+					return err
+				}
+				defer resp.Body.Close()
+
+				fontData, err := ioutil.ReadAll(resp.Body)
+				if err != nil {
+					return err
+				}
+
+				if err := ioutil.WriteFile(targetPath, fontData, 0600); err != nil {
+					return err
+				}
+
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return fmt.Errorf("invalid font file: '%s'", file.AsString())
+		}
+	}
+
+	return r.Run("fc-cache -f", false)
+}
+
 func init() {
 
 	fontsBuiltin := module.NewFactory("fonts").
@@ -45,91 +132,8 @@ func init() {
 				Default: "",
 			},
 		}).
-		WithRequiresInstallFunc(func(_ *module.Runner, vars variable.Collection) (bool, error) {
-
-			dir, err := getFontsDir(vars)
-			if err != nil {
-				return false, err
-			}
-			if err := os.MkdirAll(dir, 0700); err != nil {
-				return false, err
-			}
-
-			for _, file := range vars.Get("files").AsList().All() {
-				var filename string
-				if strings.HasPrefix(file.AsString(), "./") {
-					filename = filepath.Base(file.AsString())
-				} else if parsed, err := url.Parse(file.AsString()); err == nil && parsed.Host != "" {
-					filename = path.Base(parsed.Path)
-				}
-
-				expectedPath := filepath.Join(dir, filename)
-				if _, err := os.Stat(expectedPath); os.IsNotExist(err) {
-					return true, nil
-				}
-			}
-
-			return false, nil
-		}).
-		WithInstallFunc(func(r *module.Runner, vars variable.Collection) error {
-
-			dir, err := getFontsDir(vars)
-			if err != nil {
-				return err
-			}
-			if err := os.MkdirAll(dir, 0700); err != nil {
-				return err
-			}
-
-			for _, file := range vars.Get("files").AsList().All() {
-				var filename string
-				if strings.HasPrefix(file.AsString(), "./") {
-					filename = filepath.Base(file.AsString())
-					targetPath := filepath.Join(dir, filename)
-					if _, err := os.Stat(targetPath); !os.IsNotExist(err) {
-						continue
-					}
-
-					fontData, err := ioutil.ReadFile(file.AsString())
-					if err != nil {
-						return fmt.Errorf("failed to install font from %s: %s", file.AsString(), err)
-					}
-					if err := ioutil.WriteFile(targetPath, fontData, 0600); err != nil {
-						return err
-					}
-				} else if parsed, err := url.Parse(file.AsString()); err == nil && parsed.Host != "" {
-					filename = path.Base(parsed.Path)
-					targetPath := filepath.Join(dir, filename)
-					if _, err := os.Stat(targetPath); !os.IsNotExist(err) {
-						continue
-					}
-					if err := func() error {
-						resp, err := http.Get(parsed.String())
-						if err != nil {
-							return err
-						}
-						defer resp.Body.Close()
-
-						fontData, err := ioutil.ReadAll(resp.Body)
-						if err != nil {
-							return err
-						}
-
-						if err := ioutil.WriteFile(targetPath, fontData, 0600); err != nil {
-							return err
-						}
-
-						return nil
-					}(); err != nil {
-						return err
-					}
-				} else {
-					return fmt.Errorf("invalid font file: '%s'", file.AsString())
-				}
-			}
-
-			return r.Run("fc-cache -f", false)
-		}).
+		WithRequiresInstallFunc(fontsRequiresInstall).
+		WithInstallFunc(fontsInstall).
 		Build()
 
 	module.RegisterBuiltin("fonts", fontsBuiltin)

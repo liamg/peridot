@@ -16,7 +16,7 @@ func TestSystemCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	// run system command
 	output, exit, err := c.RunAsUser("peridot", "system", "--no-ansi")

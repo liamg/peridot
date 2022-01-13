@@ -15,7 +15,7 @@ func TestApplyCommandWithEmptyConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteConfig(``))
 
@@ -31,7 +31,7 @@ func TestApplyCommandWithInvalidConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteConfig(`this is invalid`))
 
@@ -46,7 +46,7 @@ func TestApplyCommandWithSingleFileChanges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteHomeFile(".config/peridot/lol.tmpl", `hello world`))
 
@@ -71,7 +71,7 @@ func TestApplyCommandWhenOnlyFileAlreadyMatches(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteHomeFile(".config/peridot/lol.tmpl", `hello world`))
 
@@ -95,7 +95,7 @@ func TestApplyWithSudoRequired(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	// intall sudo and allow default user to sudo without password
 	_, exit, err := c.RunAsRoot("sh", "-c", fmt.Sprintf(`apt update && apt install -y sudo && echo '%s ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers`, defaultUser))

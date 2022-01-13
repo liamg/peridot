@@ -13,7 +13,7 @@ func TestDiffCommandWithEmptyConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteConfig(``))
 
@@ -29,7 +29,7 @@ func TestDiffCommandWithInvalidConfig(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteConfig(`this is invalid`))
 
@@ -44,7 +44,7 @@ func TestDiffCommandWithSingleFileChanges(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteHomeFile(".config/peridot/lol.tmpl", `hello world`))
 
@@ -67,7 +67,7 @@ func TestDiffCommandWhenOnlyFileAlreadyMatches(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteHomeFile(".config/peridot/lol.tmpl", `hello world`))
 

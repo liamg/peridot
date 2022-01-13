@@ -12,7 +12,7 @@ func TestValidateCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	tests := []struct {
 		name    string

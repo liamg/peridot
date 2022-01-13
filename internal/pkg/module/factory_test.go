@@ -44,9 +44,9 @@ func TestFactorySetsHandlers(t *testing.T) {
 
 	built.RequiresInstall()
 	built.RequiresUpdate()
-	built.Install()
-	built.Update()
-	built.AfterFileChange()
+	_ = built.Install()
+	_ = built.Update()
+	_ = built.AfterFileChange()
 
 	assert.True(t, requiresInstall, "RequiresInstall() was not configured")
 	assert.True(t, requiresUpdate, "RequiresUpdate() was not configured")

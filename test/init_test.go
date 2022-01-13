@@ -15,7 +15,7 @@ func TestInitCommand(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	// run init command
 	output, exit, err := c.RunAsUser("peridot", "init")
@@ -43,7 +43,7 @@ func TestInitCommandCannotOverwriteConfigByDefault(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	require.NoError(t, c.WriteConfig(``))
 
@@ -61,7 +61,7 @@ func TestInitCommandWithForcedOverwrite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	// place a config
 	require.NoError(t, c.WriteConfig(``))
@@ -89,7 +89,7 @@ func TestInitCommandWithForcedOverwriteWhenConfigIsInvalid(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Stop()
+	defer func() { _ = c.Stop() }()
 
 	// place a bad config
 	require.NoError(t, c.WriteConfig(`this is invalid`))
