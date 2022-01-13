@@ -47,7 +47,7 @@ func (r *Runner) Run(command string, sudo bool) error {
 		cmd = exec.Command("sh", "-c", command)
 		output := log.NewPrefixedWriter(r.module.Name(), r.operation)
 		defer output.Flush()
-		output.Write([]byte(fmt.Sprintf("Running command: %s\n", command)))
+		_, _ = output.Write([]byte(fmt.Sprintf("Running command: %s\n", command)))
 		cmd.Stdout = output
 		cmd.Stderr = output
 	}

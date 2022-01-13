@@ -1,3 +1,6 @@
+[![GoReportCard](https://goreportcard.com/badge/github.com/liamg/peridot)](https://goreportcard.com/report/github.com/liamg/peridot)
+![Build Status](https://github.com/liamg/peridot/actions/workflows/build.yml/badge.svg)
+
 # peridot
 
 Developer machine management for Linux/OSX. Think Terraform for your dotfiles.

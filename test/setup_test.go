@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -77,7 +78,7 @@ func (t *testContainer) AddFile(hostPath string) error {
 		return err
 	}
 	target := filepath.Join(t.hostDir, filepath.Base(hostPath))
-	return ioutil.WriteFile(target, data, 0700)
+	return ioutil.WriteFile(target, data, 0700) //nolint
 }
 
 func (t *testContainer) ReadHomeFile(relativePath string) (string, error) {
@@ -97,9 +98,11 @@ func (t *testContainer) WriteConfig(content string) error {
 }
 
 func (t *testContainer) WriteHomeFile(relativePath, content string) error {
+	//nolint
 	if err := os.MkdirAll(filepath.Join(t.hostDir, filepath.Dir(relativePath)), 0777); err != nil {
 		return err
 	}
+	//nolint
 	if err := ioutil.WriteFile(filepath.Join(t.hostDir, relativePath), []byte(content), 0777); err != nil {
 		return err
 	}
@@ -143,8 +146,8 @@ func (t *testContainer) run(root bool, cmd string, args ...string) (string, int,
 	}
 
 	stdout := new(bytes.Buffer)
-	if _, err := stdcopy.StdCopy(stdout, stdout, resp.Reader); err != nil && err != io.EOF {
-		return "", 0, fmt.Errorf("copy failed: %s", err)
+	if _, err := stdcopy.StdCopy(stdout, stdout, resp.Reader); err != nil && !errors.Is(err, io.EOF) {
+		return "", 0, fmt.Errorf("copy failed: %w", err)
 	}
 
 	fmt.Println("Waiting for command...")
@@ -167,6 +170,7 @@ func (t *testContainer) Stop() error {
 	return t.client.ContainerStop(context.Background(), t.id, &timeout)
 }
 
+//nolint
 func startContainer(image string) (*testContainer, error) {
 
 	cli, err := client.NewClientWithOpts(client.FromEnv)

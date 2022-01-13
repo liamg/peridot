@@ -78,7 +78,8 @@ func Diff(m Module) ([]ModuleDiff, error) {
 	}
 
 	// run scripts.update_required and scripts.install_required to see if update is needed
-	if m.RequiresInstall() {
+	switch {
+	case m.RequiresInstall():
 		logger.Log("Installation is required!")
 		moduleDiffs = append(moduleDiffs, &moduleDiff{
 			module:    m,
@@ -86,7 +87,7 @@ func Diff(m Module) ([]ModuleDiff, error) {
 			after:     StateInstalled,
 			fileDiffs: fileDiffs,
 		})
-	} else if m.RequiresUpdate() {
+	case m.RequiresUpdate():
 		logger.Log("Update is required!")
 		moduleDiffs = append(moduleDiffs, &moduleDiff{
 			module:    m,
@@ -94,7 +95,7 @@ func Diff(m Module) ([]ModuleDiff, error) {
 			after:     StateUpdated,
 			fileDiffs: fileDiffs,
 		})
-	} else if len(fileDiffs) > 0 {
+	case len(fileDiffs) > 0:
 		logger.Log("Module has file(s) needing updates!")
 		moduleDiffs = append(moduleDiffs, &moduleDiff{
 			module:    m,

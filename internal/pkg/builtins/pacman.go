@@ -27,7 +27,7 @@ func init() {
 		}).
 		WithInstallFunc(func(r *module.Runner, vars variable.Collection) error {
 			if err := r.Run("pacman -Syy", true); err != nil {
-				return fmt.Errorf("failed to sync package db: %s", err)
+				return fmt.Errorf("failed to sync package db: %w", err)
 			}
 			for _, pkg := range vars.Get("packages").AsList().All() {
 				if err := r.Run(fmt.Sprintf("pacman -Qi %s >/dev/null", pkg.AsString()), false); err != nil {
